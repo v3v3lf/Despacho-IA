@@ -1,0 +1,47 @@
+{
+  "manifest_version": 3,
+  "name": "SISP • Despacho Pro",
+  "version": "2.0",
+  "description": "Automação inteligente para despacho de Boletins de Ocorrência no sistema SISP",
+  "short_name": "SISP Pro",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "tabs",
+    "webNavigation"
+  ],
+  "host_permissions": [
+    "https://sisp.ciasc.sc.gov.br/*",
+    "https://backend.ssp.sc.gov.br/*",
+    "*://*/*"
+  ],
+  "action": {
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://sisp.ciasc.sc.gov.br/*",
+        "https://backend.ssp.sc.gov.br/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Despacho BO</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="header">
+      <div class="badge-row">
+        <span class="badge">SISP</span>
+        <span class="version">v2.0</span>
+        <button class="btn-regras-header" id="btnRegrasToggle">
+          ⚙ REGRAS
+        </button>
+      </div>
+      <h1>Despacho <span>Pro</span> <span style="color: white; font-size: 12px; font-weight: normal; letter-spacing: normal; background: none; -webkit-text-fill-color: white;">(Del. Verdi Furlanetto)</span></h1>
+      <div class="status-bar">
+        <div class="status-dot" id="statusDot"></div>
+        <span id="statusText">Verificando...</span>
+      </div>
+    </header>
+
+    <!-- PAINEL PRINCIPAL: FLUXO -->
+    <div id="panelFlow" class="panel active">
+
+      <!-- FASE 1: INICIAR -->
+      <section class="flow-section" id="secStart">
+        <div class="flow-header">
+          <span class="step-num">①</span>
+          <span class="step-label">Iniciar processamento</span>
+        </div>
+        <button class="btn-action primary" id="btnStart">
+          ▶ Iniciar — Abrir primeiro BO
+        </button>
+      </section>
+
+      <!-- CONTROLE MANUAL -->
+      <section class="flow-section" id="secManual">
+        <div class="flow-header" id="toggleManualHeader" style="cursor:pointer;user-select:none; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span class="step-num" style="font-size:13px;">🎛</span>
+            <span class="step-label">Controle Manual ▾</span>
+          </div>
+          <button id="btnResetManual" class="btn-manual-reset">↻ Resetar</button>
+        </div>
+        <div id="manualControls" class="hidden">
+          <div class="manual-steps-list">
+
+            <!-- STEP 1 - Clique BO -->
+            <div class="manual-step-group">
+              <button class="btn-manual full" id="btnM1">① Clique BO</button>
+            </div>
+
+            <!-- STEP 2 - Abrir BO -->
+            <div class="manual-step-group">
+              <button class="btn-manual full" id="btnM2">② Abrir BO</button>
+            </div>
+
+            <!-- STEP 3 - Analisar + Fase Análise agrupada -->
+            <div class="manual-step-group">
+              <button class="btn-manual full" id="btnM3">③ Analisar</button>
+              <!-- Fase Análise do BO (aparece aqui quando ativa) -->
+              <div class="inline-phase hidden" id="secAnalysis">
+                <div class="phase-label">
+                  <span class="step-num small">③</span>
+                  <span class="step-label">Análise do BO</span>
+                </div>
+                <div class="analysis-box" id="analysisBox">
+                  <div class="analysis-loading">⟳ Lendo o BO...</div>
+                </div>
+
+                <!-- SUGESTÃO DE DESPACHO -->
+                <div id="despachoSuggestion" class="suggestion-block hidden">
+                  <div class="suggestion-label">
+                    <span class="tag" id="tipoTag">—</span>
+                    Despacho sugerido:
+                  </div>
+                  <div class="despacho-preview" id="despachoPreview"></div>
+                  <div class="btn-group">
+                    <button class="btn-action success" id="btnInsertDespacho">
+                      ✎ Inserir este despacho
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- STEP 4 - Inserir despacho + Botão "Inserir outro despacho" -->
+            <div class="manual-step-group">
+              <button class="btn-manual full" id="btnM4">④ Inserir despacho</button>
+              <!-- Select "Inserir outro despacho" unificado como botão -->
+              <div class="inline-phase" id="insertOutroDespachoWrapper">
+                <select id="selectManualTipo" class="select-outro-despacho">
+                  <option value="" style="background:#1a2235;color:#34d399;">＋ INSERIR OUTRO DESPACHO</option>
+                  <option value="fato_atipico" style="background:#1a2235;color:white;">Fato atípico</option>
+                  <option value="vitima_nao_representar" style="background:#1a2235;color:white;">Vítima não quer respresentar</option>
+                  <option value="pericia" style="background:#1a2235;color:white;">Perícia</option>
+                  <option value="dp_om_atribuicao" style="background:#1a2235;color:white;">DP com atribuição</option>
+                  <option value="decidir_posteriormente" style="background:#1a2235;color:white;">Decidir posteriormente</option>
+                  <option value="investigacao" style="background:#1a2235;color:white;">(Investigação)</option>
+                  <option value="estelionato" style="background:#1a2235;color:white;">(Estelionato)</option>
+                  <option value="queixa" style="background:#1a2235;color:white;">(Queixa)</option>
+                  <option value="jec_incondicionada" style="background:#1a2235;color:white;">(JEC-incondicionada)</option>
+                  <option value="jec_condicionada" style="background:#1a2235;color:white;">(JEC-condicionada)</option>
+                  <option value="oitivas_preliminares" style="background:#1a2235;color:white;">(OITIVAS PRELIMINARES-VÍTIMA)</option>
+                  <option value="desacordo_comercial" style="background:#1a2235;color:white;">Desacordo Comercial</option>
+                  <option value="fraude" style="background:#1a2235;color:white;">Fraude</option>
+                  <option value="estelionato_atribuicao" style="background:#1a2235;color:white;">Estelionato (Atribuição)</option>
+                  <option value="conflito_visitacao" style="background:#1a2235;color:white;">Conflito Visitação</option>
+                  <option value="devolucao_veiculo" style="background:#1a2235;color:white;">Devolução Veículo</option>
+                  <option value="cnh_sem_perigo" style="background:#1a2235;color:white;">CNH sem perigo</option>
+                  <option value="instaurar_ip" style="background:#1a2235;color:white;">Instaurar IP</option>
+                  <option value="oitivas_preliminares_testemunha" style="background:#1a2235;color:white;">(OITIVAS PRELIMINARES-TESTEMUNHA)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- STEP 5 - Destinatário + Fase Destinatário agrupada -->
+            <div class="manual-step-group">
+              <button class="btn-manual full" id="btnM5">⑤ Destinatário</button>
+              <!-- Fase Destinatário (aparece aqui quando ativa) -->
+              <div class="inline-phase hidden" id="secDestinatario">
+                <div class="phase-label">
+                  <span class="step-num small">⑤</span>
+                  <span class="step-label">Destinatário</span>
+                </div>
+                <div class="suggestion-block">
+                  <div class="suggestion-label">Policial sugerido:</div>
+                  <div class="destinatario-name" id="destinatarioName">—</div>
+                  <button class="btn-action success" id="btnAddDestinatario">
+                    ＋ Incluir destinatário
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- STEP 6 - Salvar + Fase Salvar agrupada -->
+            <div class="manual-step-group">
+              <button class="btn-manual full" id="btnM6">⑥ Salvar</button>
+              <!-- Fase Confirmações (aparece aqui quando ativa) -->
+              <div class="inline-phase hidden" id="secSalvar">
+                <div class="confirm-group">
+                  <div class="confirm-item" id="confirmSalvar">
+                    <span class="confirm-icon">💾</span>
+                    <div class="confirm-text">
+                      <strong>Salvar despacho?</strong>
+                      <small>Clica no botão verde "Salvar"</small>
+                    </div>
+                    <button class="btn-confirm" id="btnSalvar">Salvar</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- STEP 7 - Marcar resolvido -->
+            <div class="manual-step-group">
+              <button class="btn-manual full" id="btnM7">⑦ Marcar resolvido</button>
+              <div class="inline-phase hidden" id="secResolver">
+                <div class="confirm-group">
+                  <div class="confirm-item" id="confirmResolver">
+                    <span class="confirm-icon">✅</span>
+                    <div class="confirm-text">
+                      <strong>Marcar como resolvido?</strong>
+                      <small>Finaliza o BO na lista</small>
+                    </div>
+                    <button class="btn-confirm green" id="btnResolver">Resolver</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- CONCLUÍDO -->
+      <section class="flow-section hidden" id="secDone">
+        <div class="done-box">
+          <div class="done-icon">✓</div>
+          <div class="done-text">BO processado com sucesso!</div>
+          <button class="btn-action primary" id="btnNext">
+            ▶ Próximo BO
+          </button>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- PAINEL CONFIGURAÇÕES -->
+    <div id="panelConfig" class="panel">
+      <section class="section">
+        <h2 class="section-title">⚖️ Regras de Destinatários</h2>
+        <p class="section-desc">Defina qual policial recebe cada tipo de fato.</p>
+        <div id="rulesContainer"></div>
+        <button class="btn-add" id="btnAddRule">+ Adicionar Regra</button>
+      </section>
+    </div>
+
+    <!-- NAV TABS -->
+    <nav class="bottom-nav">
+      <button class="nav-tab active" data-panel="panelFlow" id="tabFlow">
+        <span>▶</span> Fluxo
+      </button>
+    </nav>
+    <div style="display:flex;gap:5px;padding:5px 10px;">
+      <button class="btn-action ghost" id="btnDebugDOM" style="margin-top:0;font-size:10px;padding:6px;">
+        🔍 Inspecionar DOM
+      </button>
+      <button class="btn-action ghost" id="btnDebugForm" style="margin-top:0;font-size:10px;color:#f0a500;padding:6px;">
+        🔎 Inspecionar FORM
+      </button>
+    </div>
+
+    <!-- LOG -->
+    <div class="log-bar">
+      <div class="log-scroll" id="logScroll">
+        <span class="log-empty">Aguardando ações...</span>
+      </div>
+    </div>
+
+  </div>
+  <script src="popup.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,607 @@
+/**
+ * Popup JS - Despacho Automático BO v2
+ * Controla o fluxo passo a passo com confirmações manuais
+ */
+
+// ---- DESPACHOS (espelhados do content.js para preview) ----
+const DESPACHOS = {
+  fato_atipico: `O Boletim de Ocorrência narra FATO ATÍPICO. Segundo entendimento do próprio STF, a instauração regular de procedimento investigativo depende necessariamente de "base empírica para tanto idônea e indicação plausível do fato delituoso a ser apurado", o que inexiste no caso em questão.(STF – Primeira Turma – Inq 3847 AgR/GO - Rel. Min. Dias Toffoli – j. em 07.04.2015 – Dje 108 de 05.06.2015 / STF – Primeira Turma – Pet 7354 AgR/DF - Rel. Min. Dias Toffoli – j. em 06.03.2018 – Dje 102 de 24.05.2018) Com efeito, a vedação legal ao poder investigativo em situações dessa natureza decorre, ainda, de eventuais ilações no campo penal por abuso de autoridade (arts. 27 e 30 da Lei n. 13.869/2019).`,
+  vitima_nao_representar: `Conforme consta no Boletim de Ocorrência, a vítima não deseja não exercer o direito de representação ou queixa contra o autor.   Segundo entendimento do próprio STF, a instauração regular de procedimento investigativo depende necessariamente de "base empírica para tanto idônea e indicação plausível do fato delituoso a ser apurado", o que inexiste no caso em questão.(STF – Primeira Turma – Inq 3847 AgR/GO - Rel. Min. Dias Toffoli – j. em 07.04.2015 – Dje 108 de 05.06.2015 / STF – Primeira Turma – Pet 7354 AgR/DF - Rel. Min. Dias Toffoli – j. em 06.03.2018 – Dje 102 de 24.05.2018) Com efeito, a vedação legal ao poder investigativo em situações dessa natureza decorre, ainda, de eventuais ilações no campo penal por abuso de autoridade (arts. 27 e 30 da Lei n. 13.869/2019).`,
+  pericia: `Requisite-se para Polícia Científica exame pericial no local dos fatos mencionado no BO, e solicite-se o envio do laudo pericial a esta Delegacia, depois retorne para este signatário para nova apreciação.`,
+  dp_om_atribuicao: `Exmo. (a) Senhor (a) Delegado (a),\nCumprimentando-o (a) cordialmente, encaminho o Boletim de Ocorrência a Vossa Excelência para ciência e providências que achar cabíveis.\nNa oportunidade, renovo protestos de elevada estima e distinta consideração.\nRespeitosamente,`,
+  decidir_posteriormente: `VISTOS (Decidir posteriormente). \nAGUARDE-SE A MANIFESTAÇÃO DA VÍTIMA no prazo decadencial, conforme a cientificação constante no Boletim de Ocorrência, em que a vítima Deseja Decidir posteriormente sobre o direito de representação ou queixa, estando ciente de que o prazo para oferecer a representação ou a queixa é de 06 (seis) meses, contados da data do fato ou da data em que vier a saber quem é o autor do fato. Pois, nos termos do artigo 5o do CPP: "§ 4o O inquérito, nos crimes em que a ação pública depender de representação, não poderá sem ela ser iniciado.; e, \n§ 5o Nos crimes de ação privada, a autoridade policial somente poderá proceder a inquérito a requerimento de quem tenha qualidade para intentá-la."`,
+  investigacao: `Efetuar a VERIFICAÇÃO PRELIMINAR DAS INFORMAÇÕES do presente Boletim de Ocorrência para a identificação do autor(es), de acordo com as informações trazidas, dos termos do artigo 5º, parágrafo 3º do CPP. Caso as diligências investigatórias realizadas não seja possível identificar o(s) autor(es), aguarde-se outro elemento de informação caracterizador da autoria do delito, não necessitando realizar nova tramitação, pois em face da carência de substrato fático criminal razoável à indicação de da autoria delitiva. Por oportuno, não custa lembrar que, segundo entendimento do próprio STF, a instauração regular de procedimento investigativo depende necessariamente de "base empírica para tanto idônea e indicação plausível do fato delituoso a ser apurado" (STF – Primeira Turma – Inq 3847 AgR/GO - Rel. Min. Dias Toffoli – j. em 07.04.2015 – Dje 108 de 05.06.2015 / STF – Primeira Turma – Pet 7354 AgR/DF - Rel. Min. Dias Toffoli – j. em 06.03.2018 – Dje 102 de 24.05.2018), o que inexiste no caso em questão.`,
+  estelionato: `Intimar a vítima para comparecer na delegacia para prestar termo de declaração preliminar e juntar os documentos comprobatórios, caso não compareça anexar no SISP esta informação e marcar como resolvido sem necessidade de tramitação. Deixar consignado na intimação que a vítima deverá:
+Trazer documentos que contenham o nome do banco, número da agência (cidade e bairro) e conta corrente do GOLPISTA na qual foi realizado o DEPÓSITO, ou esclarecer que não houve transferência (art. 70, §4, CPP -domicílio da vítima) e juntar o documento comprobatório;
+O documento que contenha o nome do banco, número da agência(cidade e bairro) da VÍTIMA no caso de FURTO de valores da CONTA (ag. da vítima);
+Ou documentos para demonstrar o local onde foi efetuada a compra fraudulenta do produto, bairro, cidade e estado em que o autor foi beneficiado com a COMPRA utilizando-se de CARTÃO CLONADO (local da compra no estabelecimento comercial) e juntar o documento comprobatório;
+Ou documentos que contenham o nome do banco, número da agência(cidade e bairro) e conta corrente de onde ocorreu o SAQUE de valor com uso de CARTÃO CLONADO (local onde ocorreu o saque fraudulento);
+Para a vítima informar onde foi o local em que ocorreu a ENTREGA A MERCADORIA (retirada do produto) e juntar o documento comprobatório;`,
+  queixa: `Conforme o princípio da Celeridade e informalidade do JEC: Fazer contato com a vítima via aplicativo para alertar a vítima que terá que contratar um advogado para propor no juizado especial a queixa-crime em seis meses. Posteriormente, anexar no SISP, sem tramitação, a captura de tela para a vítima, ou certidão.`,
+  jec_incondicionada: `Conforme o princípio da Celeridade e informalidade do JEC: Fazer contato com o AUTOR e informar que: Tem o direito de permanecer calado e se quer exercer esse direito; Pode fazer a gravação em vídeo ou audio de seu depoimento e enviar via Whatsapp, ou Pode disponibilizar link para o AUTOR prestar declaração, ou Pode fazer o comparecimento pessoal na Delegacia, Posteriormente anexar no SISP o depoimento, o vídeo ou o áudio (com sua transcrição) e/ou demais informações e tramitar ao cartório de TC.`,
+  jec_condicionada: `Conforme o princípio da Celeridade e informalidade do JEC:
+1) Intimar a vítima para comparecer na delegacia para prestar termo de declaração preliminar e alertar a vítima que ela deverá comparecer no juizado especial todas as vezes que for intimada, caso não queira representar, anexar no SISP esta informação e marcar como resolvido sem necessidade de tramitação.
+2) Caso a vítima não renuncie o direito de representação:
+2.1) Fazer contato com o AUTOR e informar que:
+a) Tem o direito de permanecer calado e se quer exercer esse direito;
+b) Pode fazer a gravação em vídeo ou audio de seu depoimento e enviar via Whatsapp, ou
+c) Pode disponibilizar link para o AUTOR prestar declaração, ou
+d) Pode fazer o comparecimento pessoal na Delegacia,
+3) Posteriormente anexar no SISP o depoimento, o vídeo ou o audio (com sua transcrição) e/ou demais informações e tramitar ao cartório de TC.`,
+  oitivas_preliminares: `Intime-se a vítima para prestar termo de declaração preliminar e juntar documentos (laudos) comprobatórios e maiores informações sobre os fatos, depois retorne para ulterior deliberação.`,
+  desacordo_comercial: `O STJ tem diversas decisões que tratam do tema. Entre os principais entendimentos, destaca-se: Ausência de dolo caracterizando desacordo comercial: "A mera inadimplência contratual não configura o delito de estelionato, pois exige-se a demonstração do dolo antecedente, ou seja, a intenção de enganar a vítima no momento da celebração do contrato." (HC 455.252/SP, Rel. Min. Nefi Cordeiro, 6ª Turma, julgado em 10/04/2018) Simulação ou fraude no contrato pode configurar estelionato: "Quando demonstrou que o agente celebrou contrato com o objetivo de, desde o início, não cumprir as obrigações pactuadas, valendo-se de planos para induzir a vítima em erro, caracterizando-se o delito de estelionato." (AgRg no AREsp 168.091/RS, Rel. Min. Maria Thereza de Assis Moura, 6ª Turma, julgada em 19/03/2019) Requisitos para caracterização do estelionato: "É indispensável a demonstração de que o agente empregou fraude ou ardil, com dolo antecedente, para obter vantagem ilícita em prejuízo da vítima. A ausência desses elementos remete ao conflito à seara cível." (AgRg no REsp 1.829.943/SP, Rel. Min. Reynaldo Soares da Fonseca, 5ª Turma, julgado em 09/03/2019).\n\nNo caso em tela, não ficou caracterizado o dolo antecedente do suposto autor, afastando o delito de estelionato. Trata-se, portanto, de conflito a ser dirimido no âmbito cível e fatos desta natureza devem ser registrados como "atípicos".\n\nAssim, a pretensão da vítima reputa-se não plausível, conforme exposto acima, e caso a não concorde com o indeferimento de instauração de inquérito policial é possível recurso para o chefe de Polícia, conforme o disposto no art. 5º, § 2º, do CPP (Do despacho que indeferir o requerimento de abertura de inquérito caberá recurso para o chefe de Polícia).`,
+  fraude: `Intimar a vítima para comparecer na delegacia para prestar termo de declaração preliminar e juntar os documentos comprobatórios, caso não compareça anexar no SISP esta informação e marcar como resolvido sem necessidade de tramitação. Deixar consignado na intimação que a vítima deverá:
+Trazer documentos que contenham o nome do banco, número da agência (cidade e bairro) e conta corrente do GOLPISTA na qual foi realizado o DEPÓSITO, ou esclarecer que não houve transferência (art. 70, §4, CPP -domicílio da vítima) e juntar o documento comprobatório;
+O documento que contenha o nome do banco, número da agência(cidade e bairro) da VÍTIMA no caso de FURTO de valores da CONTA (ag. da vítima);
+Ou documentos para demonstrar o local onde foi efetuada a compra fraudulenta do produto, bairro, cidade e estado em que o autor foi beneficiado com a COMPRA utilizando-se de CARTÃO CLONADO (local da compra no estabelecimento comercial) e juntar o documento comprobatório;
+Ou documentos que contenham o nome do banco, número da agência(cidade e bairro) e conta corrente de onde ocorreu o SAQUE de valor com uso de CARTÃO CLONADO (local onde ocorreu o saque fraudulento);
+Para a vítima informar onde foi o local em que ocorreu a ENTREGA A MERCADORIA (retirada do produto) e juntar o documento comprobatório;`,
+  estelionato_atribuicao: `Exmo. (a) Senhor (a) Delegado (a),\nCumprimentando-o (a) cordialmente, encaminho o Boletim de Ocorrência de estelionato a Vossa Excelência para ciência e providências que achar cabíveis, nos termos do CPP, art. 70, § 4º Nos crimes previstos no art. 171 do Decreto-Lei nº 2.848, de 7 de dezembro de 1940 (Código Penal), quando praticados mediante depósito, mediante emissão de cheques sem suficiente provisão de fundos em poder do sacado ou com o pagamento frustrado ou mediante transferência de valores, a competência será definida pelo local do domicílio da vítima, e, em caso de pluralidade de vítimas, a competência firmar-se-á pela prevenção.`,
+  conflito_visitacao: `Trata-se de CONFLITO RELATIVO AO DIREITO DE VISITAÇÃO DOS FILHOS MENORES DE IDADE, QUE DEVERÁ SER DIRIMIDO EM ÂMBITO CÍVEL, desta forma, não configura delito de desobediência o descumprimento de acordo judicial de visitação dos filhos, vez que é pacífico na doutrina e jurisprudência que tal infração penal não se caracteriza quando a lei comina sanções civis e/ou administrativas para o descumprimento de uma determinação legal. Nesse sentido, inclusive, é a jurisprudência do STJ: PENAL. CRIME DE DESOBEDIÊNCIA. DETERMINAÇÃO JUDICIAL ASSEGURADA POR MULTA DIÁRIA DE NATUREZA CIVIL (ASTREINTES). ATIPICIDADE DA CONDUTA. Para a configuração do delito de desobediência, salvo se a lei ressalvar expressamente a possibilidade de cumulação da sanção de natureza civil ou administrativa com a de natureza penal, não basta apenas o não cumprimento de ordem legal, sendo indispensável que, além de legal a ordem, não haja sanção determinada em lei específica no caso de descumprimento. (Precedentes). Habeas corpus concedido, ratificando os termos da liminar anteriormente concedida. (STJ, HC nº 22721/SP, Rel. Min. Félix Fischer, 5ª Turma, 27.05.03) Trata-se, portanto, de conflito a ser dirimido no âmbito cível e fatos desta natureza devem ser registrados como "atípicos".\n\nAssim, a pretensão da vítima reputa-se não plausível, conforme exposto acima, e caso a não concorde com o indeferimento de instauração de inquérito policial é possível recurso para o chefe de Polícia, conforme o disposto no art. 5º, § 2º, do CPP (Do despacho que indeferir o requerimento de abertura de inquérito caberá recurso para o chefe de Polícia).`,
+  devolucao_veiculo: `1 - Verificar onde o veículo se encontra;\n2 - Fazer contato com o proprietário, caso este veículo não tenha sido entregue:\n3 - Analisar os documentos pessoais de propriedade do automóvel;\n4 - Caso esteja regular a documentação, proceder a realização do termo de entrega do veículo, inserindo no SISP;\n5 - Inserir os documentos (termo de entrega e documentos pessoais do proprietário e do veículo) no sistema para baixa no Detrannet/BIN.`,
+  cnh_sem_perigo: `Trata-se de fato atípico, já que não se enquadra ao art 309 (Dirigir sem Habilitação ou com Direito Cassado, gerando perigo de dano), pois não gerou perigo de dano conforme descrito no relato.`,
+  oitivas_preliminares_testemunha: `Intime-se a(s) testemunha(s) para prestar termo de declaração preliminar para maiores informações sobre os fatos. Juntar documentos ou laudos, se houver, depois retorne para ulterior deliberação.`,
+  instaurar_ip: `Em razão dos elementos constantes no BO instaurar IP`,
+};
+
+const TIPO_LABELS = {
+  fato_atipico: 'Fato Atípico',
+  vitima_nao_representar: 'Vítima não quer respresentar',
+  pericia: 'Perícia',
+  dp_om_atribuicao: 'DP com atribuição',
+  decidir_posteriormente: 'Decidir Posterior.',
+  investigacao: 'Investigação',
+  estelionato: 'Estelionato',
+  queixa: 'Queixa',
+  jec_incondicionada: 'JEC-incond.',
+  jec_condicionada: 'JEC-cond.',
+  oitivas_preliminares: 'Oitivas Prelim.',
+  desacordo_comercial: 'Desacordo Comercial',
+  fraude: 'Fraude',
+  estelionato_atribuicao: 'Estelionato (Atribuição)',
+  conflito_visitacao: 'Conflito Visitação',
+  devolucao_veiculo: 'Devolução Veículo',
+  cnh_sem_perigo: 'CNH sem perigo',
+  oitivas_preliminares_testemunha: 'Oitivas Prelim.-Testemunha',
+  instaurar_ip: 'Instaurar IP',
+};
+
+const FATO_OPTIONS = [
+  { value: 'fato_atipico', label: 'FATO ATÍPICO' },
+  { value: 'vitima_nao_representar', label: 'VÍTIMA NÃO QUER REPRESENTAR' },
+  { value: 'pericia', label: 'PERÍCIA' },
+  { value: 'dp_om_atribuicao', label: 'DP COM ATRIBUIÇÃO' },
+  { value: 'decidir_posteriormente', label: 'DECIDIR POSTERIORMENTE' },
+  { value: 'investigacao', label: 'INVESTIGAÇÃO' },
+  { value: 'estelionato', label: 'ESTELIONATO' },
+  { value: 'queixa', label: 'QUEIXA' },
+  { value: 'jec_incondicionada', label: 'JEC-INCONDICIONADA' },
+  { value: 'jec_condicionada', label: 'JEC-CONDICIONADA' },
+  { value: 'oitivas_preliminares', label: 'OITIVAS PRELIMINARES-VÍTIMA' },
+  { value: 'oitivas_preliminares_testemunha', label: 'OITIVAS PRELIMINARES-TESTEMUNHA' },
+  { value: 'desacordo_comercial', label: 'DESACORDO COMERCIAL' },
+  { value: 'fraude', label: 'FRAUDE' },
+  { value: 'estelionato_atribuicao', label: 'ESTELIONATO (ATRIBUIÇÃO)' },
+  { value: 'conflito_visitacao', label: 'CONFLITO VISITAÇÃO' },
+  { value: 'devolucao_veiculo', label: 'DEVOLUÇÃO VEÍCULO' },
+  { value: 'cnh_sem_perigo', label: 'CNH SEM PERIGO' },
+  { value: 'instaurar_ip', label: 'INSTAURAR IP' },
+];
+
+// ---- STATE ----
+let rules = [];
+let logs = [];
+let currentTipo = null;
+let currentDespacho = null;
+let currentPolicial = null;
+let isAutoMode = false;
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ---- INIT ----
+chrome.storage.local.get(['rules', 'logs'], data => {
+  rules = data.rules || [];
+  logs = data.logs || [];
+  renderRules();
+  renderLogs();
+  checkTab();
+});
+
+// Listen for events from content script (via background)
+chrome.runtime.onMessage.addListener(msg => {
+  if (msg.type === 'LOG') addLog(msg.msg, msg.level);
+  if (msg.type === 'STEP_DONE') onStepDone(msg.step);
+  if (msg.type === 'STEP_ERROR') { addLog(`Erro passo ${msg.step}: ${msg.msg}`, 'error'); setStatus(msg.msg, 'error'); }
+});
+
+// Also poll storage for events from content script
+setInterval(() => {
+  chrome.storage.local.get(['lastEvent'], data => {
+    if (!data.lastEvent) return;
+    const ev = data.lastEvent;
+    // Only process once (within last 2s)
+    if (Date.now() - ev.ts > 2000) return;
+    chrome.storage.local.remove('lastEvent');
+    if (ev.type === 'LOG') addLog(ev.payload.msg, ev.payload.level);
+    if (ev.type === 'STEP_DONE') onStepDone(ev.payload.step);
+    if (ev.type === 'STEP_ERROR') { addLog(`Erro passo ${ev.payload.step}: ${ev.payload.msg}`, 'error'); }
+  });
+}, 400);
+
+// ---- TAB CHECK ----
+async function checkTab() {
+  const tab = await findTargetTab();
+  if (!tab) { setStatus('SISP não encontrado', 'warn'); return; }
+  setStatus('SISP detectado ✓', 'success');
+}
+
+// Find the SISP tab regardless of window
+async function findTargetTab() {
+  // Try active tab in ANY window first
+  const tabs = await chrome.tabs.query({ url: ['https://sisp.ciasc.sc.gov.br/*', 'https://backend.ssp.sc.gov.br/*'] });
+  if (tabs && tabs.length > 0) {
+    // Return the one that is active if possible, or just the first one
+    const active = tabs.find(t => t.active);
+    return active || tabs[0];
+  }
+  return null;
+}
+
+// ---- SEND MESSAGE ----
+// Frame type routing: each step goes to the right frame
+// Steps 1,2 -> LIST frame (tabela de BOs)
+// Steps 3-7  -> FORM frame (formulario do BO)
+// STEP3_ANALYZE -> needs response, polls all frames
+
+const STEP_FRAME_TYPE = {
+  'STEP1_CLICK_BO': 'LIST',
+  'STEP2_OPEN_BO': 'ANY',
+  'STEP3_ANALYZE': 'FORM',
+  'STEP4_INSERT_DESPACHO': 'FORM',
+  'STEP5_INCLUIR_DESTINATARIO': 'FORM',
+  'STEP6_SALVAR': 'FORM',
+  'STEP7_RESOLVER': 'FORM',
+  'DEBUG_DOM': 'ANY',
+  'DEBUG_FORM': 'FORM',
+};
+
+async function sendToTab(type, extra) {
+  extra = extra || {};
+  const tab = await findTargetTab();
+  if (!tab) {
+    addLog('Acesse o SISP primeiro (tab não encontrada)!', 'error');
+    return null;
+  }
+
+  // Sempre injeta o content script para garantir que funcione mesmo em BOs abertos manualmente ou se a página recarregou
+  try {
+    await chrome.scripting.executeScript({
+      target: { tabId: tab.id, allFrames: true },
+      files: ['content.js']
+    });
+    window.scriptsInjected = true;
+  } catch (e) {
+    console.warn('[Popup] Injection error (maybe already present or no permission):', e.message);
+  }
+  await sleep(100);
+
+  // STEP3_ANALYZE needs a real response value — poll all frames for one that has a 'tipo'
+  if (type === 'STEP3_ANALYZE') {
+    console.log('[Popup] Sending STEP3_ANALYZE to tab', tab.id);
+    return await sendToAllFramesForResponse(tab.id, Object.assign({ type }, extra));
+  }
+
+  // For all other steps: route to the correct frame type
+  const frameType = STEP_FRAME_TYPE[type] || 'ANY';
+  addLog(`Enviando ${type} para frame tipo=${frameType}`, 'info');
+
+  return new Promise(function (res) {
+    chrome.runtime.sendMessage({
+      type: 'SEND_TO_FRAME_TYPE',
+      frameType: frameType,
+      cmd: Object.assign({ type }, extra)
+    }, function (resp) {
+      if (chrome.runtime.lastError) {
+        console.error('[Popup] Send error:', chrome.runtime.lastError);
+        addLog('Erro envio: ' + chrome.runtime.lastError.message, 'error');
+        res(null);
+      } else {
+        console.log('[Popup] Response from BG:', resp);
+        if (resp && resp.fallback) {
+          addLog(`Frame ${frameType} não identificado, usando fallback`, 'warning');
+        }
+        res(resp);
+      }
+    });
+  });
+}
+
+// Poll all frames for STEP3_ANALYZE (needs actual response with 'tipo')
+async function sendToAllFramesForResponse(tabId, cmd) {
+  return new Promise(function (resolve) {
+    chrome.webNavigation.getAllFrames({ tabId: tabId }, function (frames) {
+      if (!frames || frames.length === 0) { resolve(null); return; }
+      var results = [];
+      var pending = frames.length;
+      frames.forEach(function (frame) {
+        chrome.tabs.sendMessage(tabId, cmd, { frameId: frame.frameId }, function (resp) {
+          chrome.runtime.lastError;
+          if (resp && resp.tipo) results.push(resp);
+          pending--;
+          if (pending === 0) {
+            resolve(results.length > 0 ? results[0] : null);
+          }
+        });
+      });
+    });
+  });
+}
+
+// ---- FLOW CONTROL ----
+function show(id) { document.getElementById(id).classList.remove('hidden'); }
+function hide(id) { document.getElementById(id).classList.add('hidden'); }
+function showSection(id) {
+  // Show the section and mark it as active
+  const sec = document.getElementById(id);
+  if (!sec) return;
+  sec.classList.remove('hidden');
+  sec.classList.add('active-step');
+}
+
+function onStepDone(step) {
+  // ATUALIZAR COR DO BOTAO MANUAL
+  const btnM = document.getElementById('btnM' + step);
+  if (btnM) btnM.classList.add('success');
+
+  if (step === 1) {
+    addLog('Aguardando carregamento do BO...', 'info');
+    setStatus('Aguardando BO...', 'active');
+    if (isAutoMode) {
+      setTimeout(() => { triggerStep2(); }, 150);
+    }
+  }
+  if (step === 2) {
+    addLog('BO aberto, analisando...', 'info');
+    if (isAutoMode) {
+      setTimeout(() => { triggerStep3(); }, 150);
+    }
+  }
+  if (step === 4) {
+    showSection('secDestinatario');
+    showSection('secSalvar');
+    showSection('secResolver');
+    addLog('Despacho inserido com sucesso no campo de Encaminhamento Interno ✓', 'success');
+    setStatus('Despacho inserido ✓ — adicione destinatário ou salve', 'success');
+  }
+  if (step === 5) {
+    showSection('secSalvar');
+    showSection('secResolver');
+    setStatus('Destinatário adicionado ✓', 'success');
+  }
+  if (step === 6) {
+    setStatus('Salvo ✓ — clique em Resolver para finalizar', 'success');
+    addLog('Despacho salvo! Clique em "Resolver" para marcar como resolvido.', 'success');
+    showSection('secResolver');
+  }
+  if (step === 7) {
+    hide('secSalvar');
+    hide('secResolver');
+    showSection('secDone');
+    setStatus('Concluído! ✓', 'success');
+  }
+}
+
+// DEBUG DOM
+document.getElementById('btnDebugDOM').addEventListener('click', async () => {
+  addLog('Inspecionando DOM da página (todos frames)...', 'info');
+  const res = await sendToTab('DEBUG_DOM');
+  if (!res) addLog('Erro ao inspecionar — verifique se está no SISP', 'error');
+});
+
+// DEBUG FORM - inspeciona especificamente o frame FORM
+if (document.getElementById('btnDebugForm')) {
+  document.getElementById('btnDebugForm').addEventListener('click', async () => {
+    addLog('Inspecionando frame FORM...', 'info');
+    const res = await sendToTab('DEBUG_FORM');
+    if (!res) addLog('Frame FORM não encontrado', 'error');
+    else addLog('DEBUG_FORM enviado — veja os logs acima', 'success');
+  });
+}
+
+// STEP 1 - Start
+document.getElementById('btnStart').addEventListener('click', async () => {
+  isAutoMode = true;
+  window.scriptsInjected = false; // Reset to force re-verification
+  const tab = await findTargetTab();
+  if (!tab) {
+    addLog('Acesse o SISP primeiro!', 'error');
+    setStatus('Acesse o SISP', 'error');
+    return;
+  }
+  // Reset flow
+  hide('secAnalysis'); hide('secDestinatario'); hide('secSalvar'); hide('secResolver'); hide('secDone');
+  document.getElementById('analysisBox').innerHTML = '<div class="analysis-loading">⟳ Lendo o BO...</div>';
+  hide('despachoSuggestion');
+  document.getElementById('selectManualTipo').value = '';
+
+  // Reset manual buttons
+  for (let i = 1; i <= 7; i++) {
+    const btnM = document.getElementById('btnM' + i);
+    if (btnM) btnM.classList.remove('success');
+  }
+
+  setStatus('Clicando no BO...', 'active');
+  addLog('Iniciando — clicando no primeiro BO', 'info');
+  await sendToTab('STEP1_CLICK_BO');
+});
+
+// STEP 2 - Open BO
+async function triggerStep2() {
+  setStatus('Abrindo BO...', 'active');
+  addLog('Clicando no menu do BO', 'info');
+  await sendToTab('STEP2_OPEN_BO');
+}
+
+// STEP 3 - Analyze BO
+async function triggerStep3() {
+  setStatus('Analisando BO...', 'active');
+  addLog('Lendo conteúdo do BO', 'info');
+  showSection('secAnalysis');
+
+  let res = null;
+  // Tenta analisar o BO por até 5 segundos (50 * 100ms)
+  for (let i = 0; i < 50; i++) {
+    res = await sendToTab('STEP3_ANALYZE');
+    if (res && res.tipo) break;
+    await sleep(100);
+  }
+
+  if (!res) { addLog('Erro ao analisar BO', 'error'); return; }
+
+  // Update analysis box
+  document.getElementById('analysisBox').innerHTML =
+    `<div class="analysis-fatos">Fato: <span>${res.fatos || '—'}</span></div>`;
+
+  // Show suggestion
+  currentTipo = res.tipo;
+  currentDespacho = res.despacho;
+  currentPolicial = getPolicial(res.tipo);
+
+  show('despachoSuggestion');
+  updateDespachoUI(res.tipo, res.despacho);
+  setStatus('BO analisado — aguardando sua ação', 'success');
+  addLog(`Tipo identificado: ${TIPO_LABELS[res.tipo] || 'Não identificado'}`, res.tipo ? 'success' : 'warning');
+}
+
+function updateDespachoUI(tipo, despacho) {
+  const tag = document.getElementById('tipoTag');
+  const preview = document.getElementById('despachoPreview');
+  tag.textContent = tipo ? (TIPO_LABELS[tipo] || tipo) : '?';
+  preview.textContent = despacho || 'Tipo não identificado automaticamente.';
+}
+
+function getPolicial(tipo) {
+  const rule = rules.find(r => r.fato === tipo && r.policial);
+  return rule ? rule.policial.toUpperCase() : null;
+}
+
+// STEP 4 - Insert despacho (user clicks button)
+document.getElementById('btnInsertDespacho').addEventListener('click', async () => {
+  if (!currentDespacho) { addLog('Nenhum despacho selecionado', 'error'); return; }
+  setStatus('Inserindo despacho...', 'active');
+
+  // Update destinatário section before sending
+  const policial = currentPolicial || getPolicial(currentTipo);
+  document.getElementById('destinatarioName').textContent = policial || '(nenhum configurado para este tipo)';
+
+  await sendToTab('STEP4_INSERT_DESPACHO', { despacho: currentDespacho, rules });
+});
+
+
+
+// STEP 5 - Add recipient (user clicks button)
+document.getElementById('btnAddDestinatario').addEventListener('click', async () => {
+  setStatus('Incluindo destinatário...', 'active');
+  const policial = currentPolicial || getPolicial(currentTipo);
+  await sendToTab('STEP5_INCLUIR_DESTINATARIO', { policial });
+});
+
+// STEP 6 - Save
+document.getElementById('btnSalvar').addEventListener('click', async () => {
+  setStatus('Salvando...', 'active');
+  await sendToTab('STEP6_SALVAR');
+});
+
+// STEP 7 - Mark as resolved
+document.getElementById('btnResolver').addEventListener('click', async () => {
+  setStatus('Encerrando BO...', 'active');
+  await sendToTab('STEP7_RESOLVER');
+});
+
+// Next BO
+document.getElementById('btnNext').addEventListener('click', async () => {
+  isAutoMode = true;
+  window.scriptsInjected = false; // Reset to force re-verification
+  const tab = await findTargetTab();
+  if (!tab) {
+    addLog('Acesse o SISP primeiro!', 'error');
+    setStatus('Acesse o SISP', 'error');
+    return;
+  }
+  // Reset flow
+  hide('secAnalysis'); hide('secDestinatario'); hide('secSalvar'); hide('secResolver'); hide('secDone');
+  document.getElementById('analysisBox').innerHTML = '<div class="analysis-loading">⟳ Lendo o BO...</div>';
+  hide('despachoSuggestion');
+  document.getElementById('selectManualTipo').value = '';
+
+  // Reset manual buttons
+  for (let i = 1; i <= 7; i++) {
+    const btnM = document.getElementById('btnM' + i);
+    if (btnM) btnM.classList.remove('success');
+  }
+
+  setStatus('Clicando no BO...', 'active');
+  addLog('Iniciando — clicando no próximo BO', 'info');
+  await sendToTab('STEP1_CLICK_BO');
+});
+
+// ---- TABS ----
+document.querySelectorAll('.nav-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.panel).classList.add('active');
+    // Reset REGRAS button state when switching tabs
+    document.getElementById('btnRegrasToggle').classList.remove('active');
+  });
+});
+
+// ---- REGRAS TOGGLE (header button) ----
+document.getElementById('btnRegrasToggle').addEventListener('click', () => {
+  const btn = document.getElementById('btnRegrasToggle');
+  const panelFlow = document.getElementById('panelFlow');
+  const panelConfig = document.getElementById('panelConfig');
+  const isShowingConfig = panelConfig.classList.contains('active');
+
+  if (isShowingConfig) {
+    // Voltar ao fluxo
+    panelConfig.classList.remove('active');
+    panelFlow.classList.add('active');
+    btn.classList.remove('active');
+  } else {
+    // Mostrar regras
+    panelFlow.classList.remove('active');
+    panelConfig.classList.add('active');
+    btn.classList.add('active');
+  }
+});
+
+// ---- RULES ----
+function saveRules() { chrome.storage.local.set({ rules }); }
+
+function renderRules() {
+  const c = document.getElementById('rulesContainer');
+  if (rules.length === 0) {
+    c.innerHTML = '<p style="color:var(--muted);font-size:10px;text-align:center;padding:8px 0;">Nenhuma regra configurada.</p>';
+    return;
+  }
+  c.innerHTML = '';
+  rules.forEach((rule, i) => {
+    const div = document.createElement('div');
+    div.className = 'rule-item';
+    div.innerHTML = `
+      <button class="rule-remove" data-i="${i}">×</button>
+      <label>Tipo de Fato</label>
+      <select class="rf" data-i="${i}">
+        <option value="">Selecione...</option>
+        ${FATO_OPTIONS.map(o => `<option value="${o.value}" ${rule.fato === o.value ? 'selected' : ''}>${o.label}</option>`).join('')}
+      </select>
+      <label>Nome do Policial</label>
+      <input type="text" class="rp" data-i="${i}" placeholder="Nome completo do policial conforme SISP" value="${rule.policial || ''}">
+    `;
+    c.appendChild(div);
+  });
+  c.querySelectorAll('.rf').forEach(s => s.addEventListener('change', e => { rules[+e.target.dataset.i].fato = e.target.value; saveRules(); }));
+  c.querySelectorAll('.rp').forEach(s => s.addEventListener('input', e => { rules[+e.target.dataset.i].policial = e.target.value.toUpperCase(); e.target.value = e.target.value.toUpperCase(); saveRules(); }));
+  c.querySelectorAll('.rule-remove').forEach(b => b.addEventListener('click', e => { rules.splice(+e.currentTarget.dataset.i, 1); saveRules(); renderRules(); }));
+}
+
+document.getElementById('btnAddRule').addEventListener('click', () => {
+  rules.push({ fato: '', policial: '' });
+  saveRules(); renderRules();
+  // Ensure config panel is visible
+  const panelConfig = document.getElementById('panelConfig');
+  if (!panelConfig.classList.contains('active')) {
+    document.getElementById('btnRegrasToggle').click();
+  }
+});
+
+// ---- LOG ----
+function addLog(msg, level = 'info') {
+  const now = new Date();
+  const time = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  logs.unshift({ time, msg, level });
+  if (logs.length > 60) logs.pop();
+  chrome.storage.local.set({ logs });
+  renderLogs();
+}
+
+function renderLogs() {
+  const c = document.getElementById('logScroll');
+  if (logs.length === 0) { c.innerHTML = '<span class="log-empty">Aguardando ações...</span>'; return; }
+  c.innerHTML = logs.slice(0, 8).map(l =>
+    `<div class="log-entry"><span class="log-time">${l.time}</span><span class="log-msg ${l.level}">${l.msg}</span></div>`
+  ).join('');
+}
+
+// ---- STATUS ----
+function setStatus(text, state = '') {
+  document.getElementById('statusText').textContent = text;
+  document.getElementById('statusDot').className = 'status-dot ' + (state || '');
+}
+
+// ---- CONTROLE MANUAL ----
+document.getElementById('toggleManualHeader').addEventListener('click', () => {
+  document.getElementById('manualControls').classList.toggle('hidden');
+});
+
+document.getElementById('btnResetManual').addEventListener('click', (e) => {
+  e.stopPropagation(); // Previne fechar/abrir a sanfona
+  isAutoMode = false;
+  
+  // Limpa a interface de análise e resultados
+  hide('secAnalysis'); hide('secDestinatario'); hide('secSalvar'); hide('secResolver'); hide('secDone');
+  document.getElementById('analysisBox').innerHTML = '<div style="color: #64748b; font-size: 13px;">Nenhuma análise no momento.</div>';
+  hide('despachoSuggestion');
+  document.getElementById('selectManualTipo').value = '';
+  
+  // Limpa o estado visual dos botões manuais
+  for (let i = 1; i <= 7; i++) {
+    const btnM = document.getElementById('btnM' + i);
+    if (btnM) btnM.classList.remove('success');
+  }
+  
+  setStatus('Pronto', '');
+  addLog('Ciclo manual resetado', 'info');
+});
+
+document.getElementById('btnM1').addEventListener('click', async () => { isAutoMode = false; await sendToTab('STEP1_CLICK_BO'); });
+document.getElementById('btnM2').addEventListener('click', async () => { isAutoMode = false; await triggerStep2(); });
+document.getElementById('btnM3').addEventListener('click', async () => { isAutoMode = false; await triggerStep3(); });
+
+document.getElementById('btnM4').addEventListener('click', async () => {
+  isAutoMode = false;
+  const tipo = document.getElementById('selectManualTipo').value;
+  if (!tipo && !currentDespacho) { addLog('Selecione o tipo de despacho', 'warning'); return; }
+  const desp = tipo ? DESPACHOS[tipo] : currentDespacho;
+  const pol = tipo ? getPolicial(tipo) : currentPolicial;
+  document.getElementById('destinatarioName').textContent = pol || '(nenhum configurado para este tipo)';
+  await sendToTab('STEP4_INSERT_DESPACHO', { despacho: desp, rules });
+});
+
+document.getElementById('btnM5').addEventListener('click', async () => {
+  isAutoMode = false;
+  const tipo = document.getElementById('selectManualTipo').value;
+  const pol = tipo ? getPolicial(tipo) : (currentPolicial || getPolicial(currentTipo));
+  await sendToTab('STEP5_INCLUIR_DESTINATARIO', { policial: pol });
+});
+
+document.getElementById('btnM6').addEventListener('click', async () => { isAutoMode = false; await sendToTab('STEP6_SALVAR'); });
+document.getElementById('btnM7').addEventListener('click', async () => { isAutoMode = false; await sendToTab('STEP7_RESOLVER'); });
+
+// ---- INSERIR OUTRO DESPACHO ----
+document.getElementById('selectManualTipo').addEventListener('change', async (e) => {
+  const tipo = e.target.value;
+  if (!tipo) return;
+  isAutoMode = false;
+  currentTipo = tipo;
+  currentDespacho = DESPACHOS[tipo];
+  currentPolicial = getPolicial(tipo);
+  document.getElementById('destinatarioName').textContent = currentPolicial || '(nenhum configurado para este tipo)';
+  addLog(`Inserindo despacho: ${TIPO_LABELS[tipo]}`, 'info');
+  setStatus('Inserindo despacho...', 'active');
+  await sendToTab('STEP4_INSERT_DESPACHO', { despacho: currentDespacho, rules });
+  // Reset select para o label padrão
+  e.target.value = '';
+});

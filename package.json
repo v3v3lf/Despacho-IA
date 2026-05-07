@@ -1,0 +1,16 @@
+{
+  "name": "extensao--8dp",
+  "version": "1.0.0",
+  "description": "1. Abra o Chrome e acesse: `chrome://extensions/` 2. Ative o **Modo do desenvolvedor** (canto superior direito) 3. Clique em **\"Carregar sem compactação\"** 4. Selecione a pasta **`Extensao-3`** 5. A extensão aparecerá com o ícone verde \"BO\" na barra do Chrome",
+  "main": "background.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "canvas": "^3.2.3"
+  }
+}
