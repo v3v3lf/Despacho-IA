@@ -1,11 +1,11 @@
-# Despacho-Pro — Despacho Automático BO (SISP)
+# Despacho IA — Despacho Automático BO (SISP)
 
 ## Como Instalar
 
 1. Abra o Chrome e acesse: `chrome://extensions/`
 2. Ative o **Modo do desenvolvedor** (canto superior direito)
 3. Clique em **"Carregar sem compactação"**
-4. Selecione a pasta **`Despacho Pro`**
+4. Selecione a pasta **`Despacho IA`**
 5. A extensão aparecerá com o ícone verde "BO" na barra do Chrome
 
 ## Como Usar

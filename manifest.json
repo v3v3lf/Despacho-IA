@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "SISP • Despacho Pro",
+  "name": "SISP • Despacho IA",
   "version": "2.0",
   "description": "Automação inteligente para despacho de Boletins de Ocorrência no sistema SISP",
-  "short_name": "SISP Pro",
+  "short_name": "SISP IA",
   "permissions": [
     "activeTab",
     "scripting",
