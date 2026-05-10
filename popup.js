@@ -94,14 +94,208 @@ let logs = [];
 let currentTipo = null;
 let currentDespacho = null;
 let currentPolicial = null;
+let currentResumoIA = null;
 let isAutoMode = false;
+
+const DEFAULT_GEMINI_MODEL = 'gemini-3-flash';
+let googleApiKey = '';
+let geminiModel = DEFAULT_GEMINI_MODEL;
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
+function escapeHtml(value) {
+  return String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function loadAiConfigUI() {
+  const keyInput = document.getElementById('googleApiKeyInput');
+  const modelInput = document.getElementById('geminiModelInput');
+  const status = document.getElementById('aiConfigStatus');
+  if (keyInput) keyInput.value = googleApiKey;
+  if (modelInput) {
+    const val = geminiModel || DEFAULT_GEMINI_MODEL;
+    // Se o valor salvo não estiver nas opções do select, cria uma option temporária para ele
+    if (modelInput.options && !Array.from(modelInput.options).some(opt => opt.value === val)) {
+      const newOpt = document.createElement('option');
+      newOpt.value = val;
+      newOpt.textContent = val + ' (Personalizado)';
+      modelInput.appendChild(newOpt);
+    }
+    modelInput.value = val;
+  }
+  if (status && googleApiKey) {
+    status.textContent = 'Configuração da IA salva. O resumo será gerado no passo ③ Analisar.';
+    status.className = 'success';
+  }
+}
+
+function getAiConfigFromUI() {
+  const keyInput = document.getElementById('googleApiKeyInput');
+  const modelInput = document.getElementById('geminiModelInput');
+  return {
+    googleApiKey: keyInput ? keyInput.value.trim() : googleApiKey,
+    geminiModel: (modelInput ? modelInput.value : geminiModel) || DEFAULT_GEMINI_MODEL
+  };
+}
+
+let _renderCount = 0;
+function renderAnalysisBox(fatos, resumo, state, message) {
+  _renderCount++;
+  const callId = _renderCount;
+  const hasResumo = !!resumo;
+  const preview = resumo ? resumo.substring(0, 80) + '...' : (message || 'Aguardando...');
+  console.warn(`[DIAG] renderAnalysisBox #${callId} | hasResumo=${hasResumo} | state=${state || 'none'} | preview="${preview}"`);
+  console.trace(`[DIAG] renderAnalysisBox #${callId} stack trace`);
+
+  const stateClass = state ? ' ' + state : '';
+  const resumoHtml = resumo
+    ? `<div class="analysis-resumo"><strong>Resumo do Relato Individual</strong>${escapeHtml(resumo)}</div>`
+    : `<div class="analysis-resumo${stateClass}"><strong>Resumo do Relato Individual</strong>${escapeHtml(message || 'Aguardando geração da análise...')}</div>`;
+
+  document.getElementById('analysisBox').innerHTML = resumoHtml;
+}
+
+function isRetryableGeminiError(status, message) {
+  return status === 429 || status === 500 || status === 502 || status === 503 || status === 504 ||
+    /internal|temporarily|unavailable|overloaded|timeout|rate/i.test(message || '');
+}
+
+async function callGeminiGenerate(model, apiKey, prompt) {
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      generationConfig: { temperature: 0.1, maxOutputTokens: 600 }
+    })
+  });
+
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const message = data && data.error && data.error.message ? data.error.message : `HTTP ${response.status}`;
+    const err = new Error(message);
+    err.status = response.status;
+    err.retryable = isRetryableGeminiError(response.status, message);
+    throw err;
+  }
+
+  let text = (((data.candidates || [])[0] || {}).content || {}).parts
+    ? data.candidates[0].content.parts.map(p => p.text || '').join('\n').trim()
+    : '';
+
+  // Filtra "raciocínios mentais" da IA e pega apenas a linha que contém "RESUMO:"
+  if (text.includes('RESUMO:')) {
+    const linhas = text.split('\n');
+    for (let i = linhas.length - 1; i >= 0; i--) {
+      if (linhas[i].includes('RESUMO:')) {
+        text = linhas[i].replace(/^[\s*\-\\]+/, '').replace('RESUMO:', '').trim();
+        break;
+      }
+    }
+  } else {
+    // Fallback: se a IA não gerou a palavra RESUMO, pegamos apenas a última linha válida 
+    // para evitar imprimir os rascunhos (drafts) na tela.
+    const linhas = text.split('\n').filter(l => l.trim().length > 0);
+    if (linhas.length > 0) {
+      text = linhas[linhas.length - 1].replace(/^[\s*\-\\]+/, '').trim();
+    }
+  }
+
+  if (!text) throw new Error('A API não retornou texto para a análise.');
+  return text;
+}
+
+async function gerarResumoRelatoIA(textoBo, fatos) {
+  const cfg = getAiConfigFromUI();
+  googleApiKey = cfg.googleApiKey;
+  geminiModel = cfg.geminiModel;
+
+  if (!googleApiKey) {
+    return { ok: false, skipped: true, message: 'Configure a chave API Google acima para gerar a análise automaticamente.' };
+  }
+
+  let textoRelato = (textoBo || '').trim();
+  if (!textoRelato || textoRelato.length < 20) {
+    return { ok: false, skipped: true, message: 'Nenhum texto encontrado na página do BO para análise IA.' };
+  }
+
+  // ---- EXTRAÇÃO DO RELATO INDIVIDUAL NO JAVASCRIPT ----
+  // Procura a expressão "Relato Individual:" no texto recebido e recorta SOMENTE o trecho após ela.
+  const lowerTexto = textoRelato.toLowerCase();
+  const idxRelato = lowerTexto.indexOf('relato individual');
+  if (idxRelato !== -1) {
+    let recorte = textoRelato.substring(idxRelato);
+    // Remove o rótulo "Relato Individual:" do início
+    const colonPos = recorte.indexOf(':');
+    if (colonPos !== -1 && colonPos < 30) {
+      recorte = recorte.substring(colonPos + 1).trim();
+    } else {
+      recorte = recorte.substring(17).trim();
+    }
+    // Corta na próxima seção (Outras Informações, Condições físicas, ATENDENTES, PROVIDÊNCIAS, etc.)
+    const fimMatch = recorte.match(/\n\s*(?:Outras\s+Informa[cç][oõ]es|Condi[cç][oõ]es\s+f[ií]sicas|ATENDENTES|PROVID[EÊ]NCIAS|PROCEDIMENTOS|REGISTROS\s+RELACIONADOS|ENCAMINHAMENTOS|ASSINATURAS)/i);
+    if (fimMatch) {
+      recorte = recorte.substring(0, fimMatch.index).trim();
+    }
+    if (recorte.length > 10) {
+      textoRelato = recorte;
+      console.log('[Despacho IA] Relato Individual extraído com sucesso (' + textoRelato.length + ' chars)');
+    }
+  }
+
+  const configuredModel = geminiModel.replace(/^models\//, '') || DEFAULT_GEMINI_MODEL;
+  const modelsToTry = [configuredModel];
+  if (configuredModel !== DEFAULT_GEMINI_MODEL) modelsToTry.push(DEFAULT_GEMINI_MODEL);
+
+  function buildPrompt(limit) {
+    return `Resuma o texto abaixo de forma fiel e detalhada em um único parágrafo contínuo. Sua resposta deve começar com RESUMO: seguido do parágrafo.
+
+${textoRelato.slice(0, limit)}`;
+  }
+
+  let lastError = null;
+  for (let m = 0; m < modelsToTry.length; m++) {
+    const model = modelsToTry[m];
+
+    // Primeira rodada com contexto maior; se a API retornar erro interno, tenta com contexto menor.
+    for (const limit of [12000, 6000]) {
+      const prompt = buildPrompt(limit);
+
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+          const resumo = await callGeminiGenerate(model, googleApiKey, prompt);
+          if (attempt > 1 || limit < 12000 || model !== configuredModel) {
+            addLog(`Análise IA gerada após nova tentativa (modelo ${model})`, 'success');
+          }
+          return { ok: true, resumo };
+        } catch (e) {
+          lastError = e;
+          const retryable = e.retryable || isRetryableGeminiError(e.status, e.message);
+          if (!retryable) break;
+          addLog(`API Gemini instável (${e.message}). Tentativa ${attempt}/3...`, 'warning');
+          await sleep(700 * attempt);
+        }
+      }
+    }
+  }
+
+  const msg = lastError && lastError.message ? lastError.message : 'erro desconhecido';
+  throw new Error(`API Google instável ou indisponível (${msg}). Tente novamente ou altere o modelo em ⚙ REGRAS.`);
+}
+
 // ---- INIT ----
-chrome.storage.local.get(['rules', 'logs'], data => {
+chrome.storage.local.get(['rules', 'logs', 'googleApiKey', 'geminiModel'], data => {
   rules = data.rules || [];
   logs = data.logs || [];
+  googleApiKey = data.googleApiKey || '';
+  geminiModel = data.geminiModel || DEFAULT_GEMINI_MODEL;
+  loadAiConfigUI();
   renderRules();
   renderLogs();
   checkTab();
@@ -110,7 +304,10 @@ chrome.storage.local.get(['rules', 'logs'], data => {
 // Listen for events from content script (via background)
 chrome.runtime.onMessage.addListener(msg => {
   if (msg.type === 'LOG') addLog(msg.msg, msg.level);
-  if (msg.type === 'STEP_DONE') onStepDone(msg.step);
+  if (msg.type === 'STEP_DONE') {
+    console.warn(`[DIAG] STEP_DONE via onMessage: step=${msg.step} | isAutoMode=${isAutoMode} | ts=${Date.now()}`);
+    onStepDone(msg.step);
+  }
   if (msg.type === 'STEP_ERROR') { addLog(`Erro passo ${msg.step}: ${msg.msg}`, 'error'); setStatus(msg.msg, 'error'); }
 });
 
@@ -123,7 +320,10 @@ setInterval(() => {
     if (Date.now() - ev.ts > 2000) return;
     chrome.storage.local.remove('lastEvent');
     if (ev.type === 'LOG') addLog(ev.payload.msg, ev.payload.level);
-    if (ev.type === 'STEP_DONE') onStepDone(ev.payload.step);
+    if (ev.type === 'STEP_DONE') {
+      console.warn(`[DIAG] STEP_DONE via POLLING: step=${ev.payload.step} | isAutoMode=${isAutoMode} | ts=${Date.now()} | evTs=${ev.ts}`);
+      onStepDone(ev.payload.step);
+    }
     if (ev.type === 'STEP_ERROR') { addLog(`Erro passo ${ev.payload.step}: ${ev.payload.msg}`, 'error'); }
   });
 }, 400);
@@ -226,10 +426,32 @@ async function sendToAllFramesForResponse(tabId, cmd) {
       frames.forEach(function (frame) {
         chrome.tabs.sendMessage(tabId, cmd, { frameId: frame.frameId }, function (resp) {
           chrome.runtime.lastError;
-          if (resp && resp.tipo) results.push(resp);
+          if (resp && !resp.skip && (resp.ok || resp.tipo || resp.fatos || resp.relato)) results.push(resp);
           pending--;
           if (pending === 0) {
-            resolve(results.length > 0 ? results[0] : null);
+            if (results.length === 0) { resolve(null); return; }
+
+            const scoreResult = r => {
+              const text = (r.relato || '').toLowerCase();
+              let score = Math.min(text.length, 12000) / 100;
+              if (r.frameType === 'FORM') score += 500;
+              // PRIORIDADE ABSOLUTA para o frame que contém o Relato Individual
+              if (/relato\s+individual/i.test(text)) score += 5000;
+              if (/fatos?\s+comunicados?/i.test(text)) score += 250;
+              if (/data\s+do\s+fato|local\s+do\s+fato/i.test(text)) score += 150;
+              return score;
+            };
+            const withRelato = results
+              .filter(r => r.relato && r.relato.trim().length >= 20)
+              .sort((a, b) => scoreResult(b) - scoreResult(a))[0];
+            const withTipo = results.find(r => r.tipo);
+            const base = withRelato || withTipo || results[0];
+
+            resolve(Object.assign({}, base, {
+              tipo: base.tipo || (withTipo && withTipo.tipo) || null,
+              despacho: base.despacho || (withTipo && withTipo.despacho) || null,
+              fatos: base.fatos || (withTipo && withTipo.fatos) || 'Verificar BO'
+            }));
           }
         });
       });
@@ -263,7 +485,11 @@ function onStepDone(step) {
   if (step === 2) {
     addLog('BO aberto, analisando...', 'info');
     if (isAutoMode) {
-      setTimeout(() => { triggerStep3(); }, 150);
+      console.warn(`[DIAG] onStepDone(2) -> vai chamar triggerStep3() em 150ms | ts=${Date.now()}`);
+      setTimeout(() => {
+        console.warn(`[DIAG] triggerStep3() disparado via onStepDone(2) timeout | ts=${Date.now()}`);
+        triggerStep3();
+      }, 150);
     }
   }
   if (step === 4) {
@@ -289,6 +515,25 @@ function onStepDone(step) {
     showSection('secDone');
     setStatus('Concluído! ✓', 'success');
   }
+}
+
+// CONFIG IA
+if (document.getElementById('btnSaveAiConfig')) {
+  document.getElementById('btnSaveAiConfig').addEventListener('click', () => {
+    const cfg = getAiConfigFromUI();
+    googleApiKey = cfg.googleApiKey;
+    geminiModel = cfg.geminiModel;
+    chrome.storage.local.set({ googleApiKey, geminiModel }, () => {
+      const status = document.getElementById('aiConfigStatus');
+      if (status) {
+        status.textContent = googleApiKey
+          ? `Configuração salva. Modelo: ${geminiModel}`
+          : 'Modelo salvo, mas informe a chave API Google para usar o resumo por IA.';
+        status.className = googleApiKey ? 'success' : 'error';
+      }
+      addLog('Configuração da IA salva', googleApiKey ? 'success' : 'warning');
+    });
+  });
 }
 
 // DEBUG DOM
@@ -319,8 +564,8 @@ document.getElementById('btnStart').addEventListener('click', async () => {
     return;
   }
   // Reset flow
-  hide('secAnalysis'); hide('secDestinatario'); hide('secSalvar'); hide('secResolver'); hide('secDone');
-  document.getElementById('analysisBox').innerHTML = '<div class="analysis-loading">⟳ Lendo o BO...</div>';
+  hide('secAnalysis'); hide('secResumoIA'); hide('secDestinatario'); hide('secSalvar'); hide('secResolver'); hide('secDone');
+  document.getElementById('analysisBox').innerHTML = '<div style="color: #64748b; font-size: 13px;">Clique no botão acima para gerar o resumo com IA.</div>';
   hide('despachoSuggestion');
   document.getElementById('selectManualTipo').value = '';
 
@@ -343,7 +588,13 @@ async function triggerStep2() {
 }
 
 // STEP 3 - Analyze BO
+let _step3Count = 0;
 async function triggerStep3() {
+  _step3Count++;
+  console.warn(`[DIAG] >>> triggerStep3() execução #${_step3Count} | ts=${Date.now()}`);
+  if (_step3Count > 1) {
+    console.error(`[DIAG] ⚠️ triggerStep3() chamado MAIS DE UMA VEZ! Isso causa sobrescrita do resumo.`);
+  }
   setStatus('Analisando BO...', 'active');
   addLog('Lendo conteúdo do BO', 'info');
   showSection('secAnalysis');
@@ -358,19 +609,99 @@ async function triggerStep3() {
 
   if (!res) { addLog('Erro ao analisar BO', 'error'); return; }
 
-  // Update analysis box
-  document.getElementById('analysisBox').innerHTML =
-    `<div class="analysis-fatos">Fato: <span>${res.fatos || '—'}</span></div>`;
-
-  // Show suggestion
+  // Show suggestion as soon as deterministic analysis finishes
   currentTipo = res.tipo;
   currentDespacho = res.despacho;
   currentPolicial = getPolicial(res.tipo);
+  currentFatos = res.fatos || '';
+  currentResumoIA = null;
 
   show('despachoSuggestion');
   updateDespachoUI(res.tipo, res.despacho);
-  setStatus('BO analisado — aguardando sua ação', 'success');
   addLog(`Tipo identificado: ${TIPO_LABELS[res.tipo] || 'Não identificado'}`, res.tipo ? 'success' : 'warning');
+
+  // ---- PRÉ-EXTRAÇÃO DO RELATO INDIVIDUAL (para agilizar o step 3.1) ----
+  currentRelatoText = res.relato || '';
+
+  // Tenta pegar o texto do Relato Individual que o content script cacheou no storage
+  try {
+    const stored = await new Promise(r => chrome.storage.local.get(['_sispRelatoText', '_sispRelatoTimestamp'], r));
+    if (stored._sispRelatoText && /relato\s+individual/i.test(stored._sispRelatoText)) {
+      const age = Date.now() - (stored._sispRelatoTimestamp || 0);
+      if (age < 60000) {
+        currentRelatoText = stored._sispRelatoText;
+        addLog('Relato Individual encontrado via cache do storage!', 'success');
+      }
+    }
+  } catch(e) {}
+
+  // Se ainda não tem "Relato Individual", tenta via scripting API
+  if (!/relato\s+individual/i.test(currentRelatoText)) {
+    addLog('Relato não encontrado no frame principal. Buscando em todos os frames...', 'warning');
+    try {
+      const tab = await new Promise(r => chrome.tabs.query({ active: true, currentWindow: true }, tabs => r(tabs[0])));
+      if (tab) {
+        const injectionResults = await chrome.scripting.executeScript({
+          target: { tabId: tab.id, allFrames: true },
+          func: () => document.body ? (document.body.innerText || document.body.textContent || '') : ''
+        });
+        if (injectionResults && injectionResults.length > 0) {
+          for (const frame of injectionResults) {
+            const frameText = (frame.result || '');
+            if (/relato\s+individual/i.test(frameText)) {
+              currentRelatoText = frameText;
+              addLog('Relato Individual encontrado via scripting API!', 'success');
+              break;
+            }
+          }
+        }
+      }
+    } catch(e) {
+      console.error('[Despacho IA] scripting API error:', e);
+    }
+  }
+
+  if (/relato\s+individual/i.test(currentRelatoText)) {
+    addLog('Relato Individual pré-carregado ✓ — pronto para resumir com IA', 'success');
+  }
+
+  setStatus('BO analisado — aguardando sua ação', 'success');
+}
+
+// STEP 3.1 - Resumir com IA (manual) — texto já extraído no step 3
+let currentRelatoText = '';
+let currentFatos = '';
+
+async function triggerStep3_1() {
+  if (!currentTipo) {
+    addLog('Execute o passo ③ Analisar antes de resumir com IA.', 'warning');
+    return;
+  }
+
+  showSection('secResumoIA');
+  renderAnalysisBox(currentFatos, null, '', '⟳ Gerando resumo com IA...');
+  setStatus('Gerando resumo com IA...', 'active');
+  addLog('Chamando API Gemini...', 'info');
+
+  try {
+    const resumoRes = await gerarResumoRelatoIA(currentRelatoText, currentFatos);
+    if (resumoRes.ok) {
+      currentResumoIA = resumoRes.resumo;
+      renderAnalysisBox(currentFatos, currentResumoIA);
+      addLog('Resumo IA gerado com sucesso', 'success');
+      const btn31 = document.getElementById('btnM3_1');
+      if (btn31) btn31.classList.add('success');
+    } else {
+      renderAnalysisBox(currentFatos, null, resumoRes.skipped ? 'warning' : 'error', resumoRes.message);
+      addLog(resumoRes.message, resumoRes.skipped ? 'warning' : 'error');
+    }
+  } catch (e) {
+    const msg = 'Falha ao gerar resumo IA: ' + (e.message || e);
+    renderAnalysisBox(currentFatos, null, 'error', msg);
+    addLog(msg, 'error');
+  }
+
+  setStatus('BO analisado — aguardando sua ação', 'success');
 }
 
 function updateDespachoUI(tipo, despacho) {
@@ -429,8 +760,8 @@ document.getElementById('btnNext').addEventListener('click', async () => {
     return;
   }
   // Reset flow
-  hide('secAnalysis'); hide('secDestinatario'); hide('secSalvar'); hide('secResolver'); hide('secDone');
-  document.getElementById('analysisBox').innerHTML = '<div class="analysis-loading">⟳ Lendo o BO...</div>';
+  hide('secAnalysis'); hide('secResumoIA'); hide('secDestinatario'); hide('secSalvar'); hide('secResolver'); hide('secDone');
+  document.getElementById('analysisBox').innerHTML = '<div style="color: #64748b; font-size: 13px;">Clique no botão acima para gerar o resumo com IA.</div>';
   hide('despachoSuggestion');
   document.getElementById('selectManualTipo').value = '';
 
@@ -551,8 +882,8 @@ document.getElementById('btnResetManual').addEventListener('click', (e) => {
   isAutoMode = false;
   
   // Limpa a interface de análise e resultados
-  hide('secAnalysis'); hide('secDestinatario'); hide('secSalvar'); hide('secResolver'); hide('secDone');
-  document.getElementById('analysisBox').innerHTML = '<div style="color: #64748b; font-size: 13px;">Nenhuma análise no momento.</div>';
+  hide('secAnalysis'); hide('secResumoIA'); hide('secDestinatario'); hide('secSalvar'); hide('secResolver'); hide('secDone');
+  document.getElementById('analysisBox').innerHTML = '<div style="color: #64748b; font-size: 13px;">Clique no botão acima para gerar o resumo com IA.</div>';
   hide('despachoSuggestion');
   document.getElementById('selectManualTipo').value = '';
   
@@ -561,6 +892,10 @@ document.getElementById('btnResetManual').addEventListener('click', (e) => {
     const btnM = document.getElementById('btnM' + i);
     if (btnM) btnM.classList.remove('success');
   }
+  const btn31 = document.getElementById('btnM3_1');
+  if (btn31) btn31.classList.remove('success');
+  currentRelatoText = '';
+  currentFatos = '';
   
   setStatus('Pronto', '');
   addLog('Ciclo manual resetado', 'info');
@@ -569,6 +904,7 @@ document.getElementById('btnResetManual').addEventListener('click', (e) => {
 document.getElementById('btnM1').addEventListener('click', async () => { isAutoMode = false; await sendToTab('STEP1_CLICK_BO'); });
 document.getElementById('btnM2').addEventListener('click', async () => { isAutoMode = false; await triggerStep2(); });
 document.getElementById('btnM3').addEventListener('click', async () => { isAutoMode = false; await triggerStep3(); });
+document.getElementById('btnM3_1').addEventListener('click', async () => { isAutoMode = false; await triggerStep3_1(); });
 
 document.getElementById('btnM4').addEventListener('click', async () => {
   isAutoMode = false;

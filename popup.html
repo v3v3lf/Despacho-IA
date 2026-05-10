@@ -70,9 +70,6 @@
                   <span class="step-num small">③</span>
                   <span class="step-label">Análise do BO</span>
                 </div>
-                <div class="analysis-box" id="analysisBox">
-                  <div class="analysis-loading">⟳ Lendo o BO...</div>
-                </div>
 
                 <!-- SUGESTÃO DE DESPACHO -->
                 <div id="despachoSuggestion" class="suggestion-block hidden">
@@ -86,6 +83,20 @@
                       ✎ Inserir este despacho
                     </button>
                   </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- STEP 3.1 - Resumir com IA -->
+            <div class="manual-step-group">
+              <button class="btn-manual full" id="btnM3_1" style="background: linear-gradient(135deg, #1e3a5f 0%, #0f2027 100%); border: 1px solid #38bdf8;"><span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;border:1.5px solid currentColor;font-size:10px;font-weight:bold;margin-right:4px;flex-shrink:0;">3.1</span> Resumir com IA</button>
+              <div class="inline-phase hidden" id="secResumoIA">
+                <div class="phase-label">
+                  <span class="step-num small" style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;border:1.5px solid currentColor;font-size:10px;font-weight:bold;">3.1</span>
+                  <span class="step-label">Resumo do Relato Individual</span>
+                </div>
+                <div class="analysis-box" id="analysisBox">
+                  <div style="color: #64748b; font-size: 13px;">Clique no botão acima para gerar o resumo com IA.</div>
                 </div>
               </div>
             </div>
@@ -193,6 +204,35 @@
 
     <!-- PAINEL CONFIGURAÇÕES -->
     <div id="panelConfig" class="panel">
+      <section class="section" id="secAiConfig">
+        <h2 class="section-title">🤖 IA Google</h2>
+        <p class="section-desc">Configure a chave API e o modelo Gemini usados para analisar o BO no passo ③ Analisar.</p>
+        <div class="ai-config-grid">
+          <label for="googleApiKeyInput">Chave API Google</label>
+          <input type="password" id="googleApiKeyInput" placeholder="Cole sua API key do Google AI Studio">
+          <a class="ai-key-link" href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">Obter chave API no Google AI Studio ↗</a>
+          <label for="geminiModelInput">Modelo Gemini</label>
+          <select id="geminiModelInput">
+            <optgroup label="⚡ Super Rápidos (Recomendados para Resumo)">
+              <option value="gemini-3.1-flash-lite">Gemini 3.1 Flash Lite (⚡⚡⚡ Ultra Rápido)</option>
+              <option value="gemini-3-flash" selected>Gemini 3 Flash (⚡⚡ Muito Rápido / Atual Padrão)</option>
+              <option value="gemini-2.0-flash">Gemini 2.0 Flash (⚡ Rápido / Estável)</option>
+            </optgroup>
+            <optgroup label="🧠 Modelos Pro / Reasoning (Mais Inteligentes, Mais Lentos)">
+              <option value="gemini-3.1-pro">Gemini 3.1 Pro (🐢 Lento / Mais Inteligente Atual)</option>
+              <option value="gemini-2.5-pro">Gemini 2.5 Pro (🐢 Lento / Inteligente Estável)</option>
+              <option value="gemini-2.5-flash">Gemini 2.5 Flash (⚡ Médio / Inteligente)</option>
+            </optgroup>
+            <optgroup label="💎 Outros Modelos Legados">
+              <option value="gemini-1.5-flash">Gemini 1.5 Flash (Antigo)</option>
+              <option value="gemma-4-26b-a4b-it">Gemma 4 26B (Custom/Local)</option>
+            </optgroup>
+          </select>
+          <button class="btn-action ghost" id="btnSaveAiConfig">Salvar configuração da IA</button>
+          <small id="aiConfigStatus">A IA fará a análise do BO ao acionar o passo ③ Analisar.</small>
+        </div>
+      </section>
+
       <section class="section">
         <h2 class="section-title">⚖️ Regras de Destinatários</h2>
         <p class="section-desc">Defina qual policial recebe cada tipo de fato.</p>

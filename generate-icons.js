@@ -11,84 +11,64 @@ if (!fs.existsSync(iconsDir)) {
   fs.mkdirSync(iconsDir, { recursive: true });
 }
 
-// Premium color palette
+// Color palette requested: white icon with green "Sisp" text
 const colors = {
-  bg: '#080b14',
-  surface: '#0d1117',
-  accent: '#00e5bb',
-  accentDark: '#00c9a7',
-  text: '#e2e8f0',
-  glow: 'rgba(0, 229, 187, 0.4)'
+  bg: '#ffffff',
+  border: '#d1fae5',
+  green: '#00a86b',
+  greenDark: '#047857',
+  shadow: 'rgba(4, 120, 87, 0.18)'
 };
 
 function drawIcon(size) {
   const canvas = createCanvas(size, size);
   const ctx = canvas.getContext('2d');
-  
+
   const scale = size / 128;
-  
-  // Background - dark gradient
-  const bgGrad = ctx.createLinearGradient(0, 0, size, size);
-  bgGrad.addColorStop(0, '#0f172a');
-  bgGrad.addColorStop(1, '#080b14');
-  ctx.fillStyle = bgGrad;
-  ctx.fillRect(0, 0, size, size);
-  
-  // Border/frame effect
-  ctx.strokeStyle = 'rgba(0, 229, 187, 0.3)';
-  ctx.lineWidth = 1 * scale;
-  ctx.strokeRect(2 * scale, 2 * scale, size - 4 * scale, size - 4 * scale);
-  
-  // Inner glow
-  const innerGrad = ctx.createRadialGradient(
-    size / 2, size / 2, 0,
-    size / 2, size / 2, size / 2
-  );
-  innerGrad.addColorStop(0, 'rgba(0, 229, 187, 0.15)');
-  innerGrad.addColorStop(1, 'rgba(0, 229, 187, 0)');
-  ctx.fillStyle = innerGrad;
-  ctx.fillRect(4 * scale, 4 * scale, size - 8 * scale, size - 8 * scale);
-  
-  // Main accent box (rounded rectangle)
-  const boxSize = size * 0.7;
-  const boxX = (size - boxSize) / 2;
-  const boxY = (size - boxSize) / 2;
-  const radius = 12 * scale;
-  
+  const radius = 22 * scale;
+  const padding = 6 * scale;
+
+  // Transparent outside + white rounded square
+  ctx.clearRect(0, 0, size, size);
+
   ctx.beginPath();
-  ctx.roundRect(boxX, boxY, boxSize, boxSize, radius);
-  ctx.fillStyle = colors.accent;
+  ctx.roundRect(padding, padding, size - padding * 2, size - padding * 2, radius);
+  ctx.fillStyle = colors.bg;
   ctx.fill();
-  
-  // Inner shadow for depth
-  ctx.beginPath();
-  ctx.roundRect(boxX + 2 * scale, boxY + 2 * scale, boxSize - 4 * scale, boxSize - 4 * scale, radius - 2 * scale);
-  ctx.fillStyle = colors.accentDark;
-  ctx.fill();
-  
-  // Text "S" for SISP
-  const fontSize = size * 0.45;
-  ctx.fillStyle = '#080b14';
-  ctx.font = `bold ${fontSize}px Arial, sans-serif`;
+
+  // Subtle green border
+  ctx.lineWidth = Math.max(1, 3 * scale);
+  ctx.strokeStyle = colors.border;
+  ctx.stroke();
+
+  // Soft shadow/glow inside
+  const glow = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+  glow.addColorStop(0, 'rgba(16, 185, 129, 0.10)');
+  glow.addColorStop(1, 'rgba(16, 185, 129, 0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(padding, padding, size - padding * 2, size - padding * 2);
+
+  // Text "Sisp" in green. For tiny 16px icon, use "S" for legibility.
+  const text = size <= 16 ? 'S' : 'Sisp';
+  const fontSize = size <= 16 ? size * 0.66 : size * 0.34;
+  ctx.fillStyle = colors.green;
+  ctx.font = `800 ${fontSize}px Arial, Helvetica, sans-serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText('S', size / 2, size / 2 + 2 * scale);
-  
-  // Small accent dot (badge indicator)
-  const dotSize = size * 0.12;
-  const dotX = size - dotSize - 4 * scale;
-  const dotY = 4 * scale;
-  ctx.beginPath();
-  ctx.arc(dotX + dotSize / 2, dotY + dotSize / 2, dotSize / 2, 0, Math.PI * 2);
-  ctx.fillStyle = '#34d399';
-  ctx.fill();
-  
-  // Glow effect around dot
-  ctx.beginPath();
-  ctx.arc(dotX + dotSize / 2, dotY + dotSize / 2, dotSize / 2 + 2 * scale, 0, Math.PI * 2);
-  ctx.fillStyle = 'rgba(52, 211, 153, 0.3)';
-  ctx.fill();
-  
+  ctx.fillText(text, size / 2, size / 2 + 2 * scale);
+
+  // Small green underline for brand accent on larger icons
+  if (size > 16) {
+    const lineW = size * 0.46;
+    const lineH = Math.max(2, 5 * scale);
+    const lineX = (size - lineW) / 2;
+    const lineY = size * 0.69;
+    ctx.beginPath();
+    ctx.roundRect(lineX, lineY, lineW, lineH, lineH / 2);
+    ctx.fillStyle = colors.greenDark;
+    ctx.fill();
+  }
+
   // Save the icon
   const buffer = canvas.toBuffer('image/png');
   fs.writeFileSync(path.join(iconsDir, `icon${size}.png`), buffer);

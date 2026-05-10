@@ -10,6 +10,13 @@
 
 ## Como Usar
 
+### Configurar IA Google para análise do BO
+1. Clique no ícone da extensão para abrir o painel
+2. Clique em **"⚙ REGRAS"** e, na seção **"IA Google"**, informe a chave API do Google AI Studio
+3. Informe o modelo Gemini desejado, por exemplo: `gemini-3-flash-preview`
+4. Clique em **"Salvar configuração da IA"**
+5. Ao acionar o passo **③ Analisar**, a extensão gera e exibe uma análise resumida do BO em parágrafo único
+
 ### Configurar Regras de Destinatários
 1. Clique no ícone da extensão para abrir o popup
 2. Na seção **"Regras de Destinatários"**, clique em **"+ Adicionar Regra"**

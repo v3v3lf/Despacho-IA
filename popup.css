@@ -273,6 +273,66 @@ body {
   padding-left: 17px;
 }
 
+.ai-config-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ai-config-grid label {
+  color: var(--text-dim);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.ai-config-grid input {
+  width: 100%;
+  background: rgba(8, 11, 20, 0.9);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  outline: none;
+  padding: 10px 12px;
+  transition: all 0.2s;
+}
+
+.ai-config-grid input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(0, 229, 187, 0.15);
+}
+
+.ai-config-grid small {
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.ai-key-link {
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 700;
+  margin: -2px 0 4px;
+  text-decoration: none;
+}
+
+.ai-key-link:hover {
+  color: var(--green);
+  text-decoration: underline;
+}
+
+.ai-config-grid small.success {
+  color: var(--green);
+}
+
+.ai-config-grid small.error {
+  color: var(--danger);
+}
+
 .flow-header {
   display: flex;
   align-items: center;
@@ -610,6 +670,35 @@ body {
 .analysis-fatos span {
   color: var(--accent2);
   font-weight: 700;
+}
+
+.analysis-resumo {
+  border-top: 1px solid var(--border-subtle);
+  color: var(--text);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  line-height: 1.6;
+  margin-top: 10px;
+  padding-top: 10px;
+  white-space: pre-wrap;
+}
+
+.analysis-resumo strong {
+  color: var(--accent);
+  display: block;
+  font-family: 'Syne', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.8px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.analysis-resumo.warning {
+  color: var(--warning);
+}
+
+.analysis-resumo.error {
+  color: var(--danger);
 }
 
 /* SUGGESTION - Glass card premium */

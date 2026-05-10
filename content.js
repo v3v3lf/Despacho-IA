@@ -8,6 +8,25 @@ if (window.__sispInjected) {
 } else {
   window.__sispInjected = true;
 
+// ---- AUTO-DETECÇÃO DO RELATO INDIVIDUAL ----
+// A cada 2 segundos (por 30 seg), verifica se este frame contém "Relato Individual:"
+// Se encontrar, salva o texto completo no chrome.storage para o popup consumir.
+(function autoDetectRelato() {
+  var checks = 0;
+  var maxChecks = 15; // 15 * 2s = 30 segundos
+  var interval = setInterval(function() {
+    checks++;
+    if (checks > maxChecks) { clearInterval(interval); return; }
+    try {
+      var bodyText = document.body ? (document.body.innerText || document.body.textContent || '') : '';
+      if (/relato\s+individual/i.test(bodyText)) {
+        chrome.storage.local.set({ _sispRelatoText: bodyText, _sispRelatoTimestamp: Date.now() });
+        console.log('[BO Extension] Relato Individual DETECTADO neste frame (' + bodyText.length + ' chars). Salvo no storage.');
+        clearInterval(interval);
+      }
+    } catch(e) {}
+  }, 2000);
+})();
 
 // ============================
 // IDENTIFICACAO DO FRAME
@@ -418,12 +437,266 @@ async function step2_openBO() {
 // ============================
 // STEP 3 - Analisar BO (frame do formulario)
 // ============================
+function cleanBoText(text) {
+  return (text || '')
+    .normalize('NFC')
+    .replace(/\r/g, '\n')
+    .replace(/[\u200B-\u200D\uFEFF]/g, '')
+    .replace(/[\t\u00A0 ]+/g, ' ')
+    .replace(/\n[\t\u00A0 ]+/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
+function isVisibleElement(el) {
+  if (!el) return false;
+  var r = el.getBoundingClientRect ? el.getBoundingClientRect() : { width: 1, height: 1 };
+  var st = window.getComputedStyle ? window.getComputedStyle(el) : null;
+  return (!st || (st.display !== 'none' && st.visibility !== 'hidden')) && (r.width > 0 || r.height > 0);
+}
+
+function getFormTextCandidates(root) {
+  root = root || document;
+  var selectors = 'textarea, [contenteditable="true"], input:not([type="hidden"]):not([type="button"]):not([type="submit"]):not([type="checkbox"]):not([type="radio"])';
+  var seen = {};
+  return Array.from(root.querySelectorAll(selectors))
+    .filter(isVisibleElement)
+    .map(function (el) { return cleanBoText(el.value || el.innerText || el.textContent || el.getAttribute('aria-label') || ''); })
+    .filter(function (value) {
+      if (value.length < 20 || seen[value]) return false;
+      seen[value] = true;
+      return true;
+    })
+    .sort(function (a, b) { return b.length - a.length; });
+}
+
+function collectDeepText(root, depth) {
+  depth = depth || 0;
+  if (!root || depth > 8) return '';
+
+  var parts = [];
+  try {
+    if (root.nodeType === Node.ELEMENT_NODE) {
+      var el = root;
+      var tag = (el.tagName || '').toLowerCase();
+      if (tag === 'script' || tag === 'style' || tag === 'noscript') return '';
+      if (tag === 'textarea' || tag === 'input') parts.push(el.value || '');
+      if (el.getAttribute) {
+        parts.push(el.getAttribute('aria-label') || '');
+        parts.push(el.getAttribute('title') || '');
+      }
+      if (el.shadowRoot) parts.push(collectDeepText(el.shadowRoot, depth + 1));
+    }
+
+    if (root.childNodes && root.childNodes.length) {
+      root.childNodes.forEach(function (child) {
+        if (child.nodeType === Node.TEXT_NODE) parts.push(child.textContent || '');
+        else parts.push(collectDeepText(child, depth + 1));
+      });
+    }
+  } catch (e) { }
+
+  return cleanBoText(parts.join('\n'));
+}
+
+function cutAfterRelato(text) {
+  var stopRegex = /\n\s*(?:RELATO\s+INDIVIDUAL|RELATOS?\s+INDIVIDUAIS?|ENVOLVIDOS?|V[ÍI]TIMAS?|COMUNICANTE|DECLARANTE|AUTORES?|SUSPEITOS?|TESTEMUNHAS?|OBJETOS?|ANEXOS?|PROCEDIMENTOS?|PROVID[ÊE]NCIAS?|ENCAMINHAMENTO|OUTROS DESPACHOS|ESCLARECIMENTO\s*\/\s*DESPACHO|DADOS DO BO|CLASSIFICA[ÇC][ÃA]O|NATUREZA|UNIDADE|HIST[ÓO]RICO\s+DE\s+ALTERA[ÇC][ÕO]ES)\b/i;
+  var stop = stopRegex.exec(text || '');
+  if (stop && stop.index > 80) return text.slice(0, stop.index);
+  return text;
+}
+
+function extractTextAfterStandaloneRelato(text) {
+  var lines = cleanBoText(text).split('\n').map(function (line) { return line.trim(); });
+  var labels = /^(?:relato|narrativa|hist[óo]rico|descri[çc][ãa]o(?: dos? fatos)?|texto do relato|conte[úu]do do relato)\s*:?$/i;
+  var inline = /^(?:relato|narrativa|hist[óo]rico|descri[çc][ãa]o(?: dos? fatos)?|texto do relato|conte[úu]do do relato)\s*[:\-–—]\s*(.+)$/i;
+
+  for (var i = 0; i < lines.length; i++) {
+    var m = inline.exec(lines[i]);
+    if (m && m[1] && m[1].length > 30) {
+      return cutAfterRelato(cleanBoText([m[1]].concat(lines.slice(i + 1)).join('\n')));
+    }
+    if (labels.test(lines[i])) {
+      return cutAfterRelato(cleanBoText(lines.slice(i + 1).join('\n')));
+    }
+  }
+  return '';
+}
+
+function looksLikeNarrative(text) {
+  var t = cleanBoText(text);
+  if (t.length < 60) return false;
+  var words = t.split(/\s+/).length;
+  var lower = t.toLowerCase();
+  var narrativeWords = /(relata|informa|declara|alega|comunica|foi|estava|teve|sofreu|recebeu|percebeu|constatou|ameaç|agred|ofend|injuri|xing|subtra|furt|roub|golpe|engan|danific|invadi|persegui|ocorreu|autor|suspeit|vítim|vitim)/i.test(lower);
+  var metadataOnly = /^(dados do relato|data|hora|unidade|munic[íi]pio|nome|cpf|rg|telefone|endere[çc]o|email|e-mail|tipo do relato|comunicante|declarante|v[íi]tima)[:\s\n\d\/.,-]+$/i.test(t);
+  return !metadataOnly && (narrativeWords || (words > 35 && /[.!?]/.test(t)));
+}
+
+function findRelatoIndividualSectionText() {
+  var elements = Array.from(document.querySelectorAll('body *'))
+    .filter(isVisibleElement)
+    .filter(function (el) {
+      var own = cleanBoText(el.innerText || el.textContent || '');
+      return /relato\s+individual/i.test(own);
+    })
+    .sort(function (a, b) {
+      return (cleanBoText(a.innerText || '').length || 0) - (cleanBoText(b.innerText || '').length || 0);
+    });
+
+  for (var i = 0; i < elements.length; i++) {
+    var el = elements[i];
+    var node = el;
+    for (var depth = 0; node && depth < 6; depth++, node = node.parentElement) {
+      var parts = [node.innerText || ''].concat(getFormTextCandidates(node));
+      var txt = cleanBoText(parts.join('\n'));
+      if (/relato\s+individual/i.test(txt) && txt.length > 120) return txt;
+    }
+  }
+  return '';
+}
+
+function buildSearchIndex(text) {
+  var original = cleanBoText(text);
+  var folded = '';
+  var map = [];
+
+  for (var i = 0; i < original.length; i++) {
+    var normalized = original[i].normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    if (!normalized) continue;
+    for (var j = 0; j < normalized.length; j++) {
+      folded += normalized[j];
+      map.push(i);
+    }
+  }
+
+  return { original: original, folded: folded, map: map };
+}
+
+function extractRelatoIndividualText(text) {
+  var indexed = buildSearchIndex(text);
+  if (!indexed.folded) return '';
+
+  var bases = [{ pos: 0, weight: 0 }];
+  var envolvidosRegex = /envolvidos?\s*[:\-–—*]?\s*/g;
+  var envolvidosMatch;
+  while ((envolvidosMatch = envolvidosRegex.exec(indexed.folded)) !== null) {
+    bases.push({ pos: envolvidosMatch.index + envolvidosMatch[0].length, weight: 100000 });
+  }
+
+  var relatoRegex = /(?:relato\s+individual|hist[oó]rico(?:\s+da\s+ocorr[eê]ncia)?)\s*[:\-–—*]?\s*/g;
+  var outrasInfoRegex = /outras\s+informacoes\s*[:\-–—*]?/;
+  var sectionEndRegex = /\n\s*(?:dados\s+do\s+relato|relato\s+individual|envolvidos?|objetos?|anexos?|procedimentos?|providencias?|encaminhamento|outros\s+despachos|esclarecimento\s*\/\s*despacho|historico\s+de\s+alteracoes|dados\s+do\s+bo|classificacao|natureza|unidade)\s*[:\-–—*]?/;
+  var bestCandidate = '';
+  var bestScore = -1;
+
+  for (var b = 0; b < bases.length; b++) {
+    var base = bases[b];
+    var search = indexed.folded.slice(base.pos);
+    relatoRegex.lastIndex = 0;
+    var match;
+
+    while ((match = relatoRegex.exec(search)) !== null) {
+      var foldedStart = base.pos + match.index + match[0].length;
+      var afterStart = indexed.folded.slice(foldedStart);
+      var end = outrasInfoRegex.exec(afterStart) || sectionEndRegex.exec(afterStart);
+
+      var originalStart = indexed.map[foldedStart] == null ? indexed.original.length : indexed.map[foldedStart];
+      var originalEnd;
+      if (end) {
+        originalEnd = indexed.map[foldedStart + end.index] == null ? indexed.original.length : indexed.map[foldedStart + end.index];
+      } else {
+        originalEnd = Math.min(indexed.original.length, originalStart + 6000);
+      }
+
+      var candidate = cleanBoText(indexed.original.slice(originalStart, originalEnd));
+      if (candidate.length < 20) continue;
+
+      var score = base.weight + candidate.length;
+      if (score > bestScore) {
+        bestScore = score;
+        bestCandidate = candidate;
+      }
+    }
+  }
+
+  return bestCandidate;
+}
+
+function compactBoText(text) {
+  var seen = {};
+  var lines = cleanBoText(text).split('\n');
+  var out = [];
+
+  for (var i = 0; i < lines.length; i++) {
+    var line = cleanBoText(lines[i]);
+    if (!line) continue;
+    var key = line.toLowerCase();
+    if (seen[key]) continue;
+    seen[key] = true;
+    out.push(line);
+  }
+
+  return cleanBoText(out.join('\n'));
+}
+
+function extractRelatoBO(silent) {
+  var visibleText = cleanBoText(document.body.innerText || '');
+  var deepText = cleanBoText(collectDeepText(document.body));
+  var formCandidates = getFormTextCandidates(document);
+  var sources = [visibleText, deepText].concat(formCandidates);
+  var fullText = compactBoText(sources.join('\n'));
+  if (fullText) sources.push(fullText);
+
+  var bestCandidate = '';
+  for (var i = 0; i < sources.length; i++) {
+    var candidate = extractRelatoIndividualText(sources[i]);
+    if (candidate.length > bestCandidate.length) bestCandidate = candidate;
+  }
+
+  if (bestCandidate) {
+    log('Relato Individual extraído do campo ENVOLVIDOS (' + bestCandidate.length + ' chars)', 'info');
+    return bestCandidate.slice(0, 12000);
+  }
+
+  if (!silent) log('Não foi possível localizar o texto após "Relato Individual" no campo ENVOLVIDOS.', 'warning');
+  return '';
+}
+
 function step3_analyze() {
-  if (!isFormFrame()) return null;
   var tipo = analyzeBO();
-  var fatos = (document.body.innerText.match(/FATOS COMUNICADOS[:\s]+([^\n]+)/i) || [])[1] || '';
-  if (!fatos) fatos = (document.body.innerText.match(/Fatos? Comunicados?[:\s]+([^\n]+)/i) || [])[1] || 'Verificar BO';
-  return { tipo: tipo, despacho: tipo ? DESPACHOS[tipo] : null, fatos: fatos.trim() };
+  var bodyText = document.body.innerText || document.body.textContent || '';
+  var fatos = (bodyText.match(/FATOS COMUNICADOS[:\s]+([^\n]+)/i) || [])[1] || '';
+  if (!fatos) fatos = (bodyText.match(/Fatos? Comunicados?[:\s]+([^\n]+)/i) || [])[1] || 'Verificar BO';
+  
+  // Coleta o texto mais completo possível de TODAS as fontes
+  var allTexts = [bodyText];
+  
+  try { allTexts.push(collectDeepText(document.body)); } catch(e) {}
+  
+  // Também busca dentro de iframes acessíveis
+  try {
+      var iframes = document.querySelectorAll('iframe');
+      for (var f = 0; f < iframes.length; f++) {
+          try {
+              var iframeDoc = iframes[f].contentDocument || iframes[f].contentWindow.document;
+              if (iframeDoc && iframeDoc.body) {
+                  var iText = iframeDoc.body.innerText || iframeDoc.body.textContent || '';
+                  if (iText.length > 50) allTexts.push(iText);
+                  try { allTexts.push(collectDeepText(iframeDoc.body)); } catch(e) {}
+              }
+          } catch(e) {}
+      }
+  } catch(e) {}
+
+  // Junta tudo e remove duplicatas de linhas
+  var combined = allTexts.join('\n');
+  var textToSend = cleanBoText(combined);
+  
+  if (!isFormFrame() && (!textToSend || textToSend.length < 50)) return null;
+
+  log('Texto completo do BO coletado (' + textToSend.length + ' chars)', 'info');
+  return { ok: true, tipo: tipo, despacho: tipo ? DESPACHOS[tipo] : null, fatos: fatos.trim(), relato: textToSend.slice(0, 30000), frameType: frameType() };
 }
 
 // ============================
