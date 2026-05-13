@@ -113,6 +113,8 @@ let currentTipo = null;
 let currentDespacho = null;
 let currentPolicial = null;
 let currentResumoIA = null;
+let currentRelatoText = '';
+let currentFatos = '';
 let isAutoMode = false;
 
 const DEFAULT_GEMINI_MODEL = 'gemini-3-flash';
@@ -167,8 +169,6 @@ function renderAnalysisBox(fatos, resumo, state, message) {
   const callId = _renderCount;
   const hasResumo = !!resumo;
   const preview = resumo ? resumo.substring(0, 80) + '...' : (message || 'Aguardando...');
-  console.warn(`[DIAG] renderAnalysisBox #${callId} | hasResumo=${hasResumo} | state=${state || 'none'} | preview="${preview}"`);
-  console.trace(`[DIAG] renderAnalysisBox #${callId} stack trace`);
 
   const stateClass = state ? ' ' + state : '';
   const resumoHtml = resumo
@@ -367,7 +367,6 @@ initApp();
 chrome.runtime.onMessage.addListener(msg => {
   if (msg.type === 'LOG') addLog(msg.msg, msg.level);
   if (msg.type === 'STEP_DONE') {
-    console.warn(`[DIAG] STEP_DONE via onMessage: step=${msg.step} | isAutoMode=${isAutoMode} | ts=${Date.now()}`);
     onStepDone(msg.step);
   }
   if (msg.type === 'STEP_ERROR') { addLog(`Erro passo ${msg.step}: ${msg.msg}`, 'error'); setStatus(msg.msg, 'error'); }
@@ -383,7 +382,6 @@ setInterval(() => {
     chrome.storage.local.remove('lastEvent');
     if (ev.type === 'LOG') addLog(ev.payload.msg, ev.payload.level);
     if (ev.type === 'STEP_DONE') {
-      console.warn(`[DIAG] STEP_DONE via POLLING: step=${ev.payload.step} | isAutoMode=${isAutoMode} | ts=${Date.now()} | evTs=${ev.ts}`);
       onStepDone(ev.payload.step);
     }
     if (ev.type === 'STEP_ERROR') { addLog(`Erro passo ${ev.payload.step}: ${ev.payload.msg}`, 'error'); }
@@ -547,9 +545,7 @@ function onStepDone(step) {
   if (step === 2) {
     addLog('BO aberto, analisando...', 'info');
     if (isAutoMode) {
-      console.warn(`[DIAG] onStepDone(2) -> vai chamar triggerStep3() em 150ms | ts=${Date.now()}`);
       setTimeout(() => {
-        console.warn(`[DIAG] triggerStep3() disparado via onStepDone(2) timeout | ts=${Date.now()}`);
         triggerStep3();
       }, 150);
     }
@@ -653,10 +649,6 @@ async function triggerStep2() {
 let _step3Count = 0;
 async function triggerStep3() {
   _step3Count++;
-  console.warn(`[DIAG] >>> triggerStep3() execução #${_step3Count} | ts=${Date.now()}`);
-  if (_step3Count > 1) {
-    console.error(`[DIAG] ⚠️ triggerStep3() chamado MAIS DE UMA VEZ! Isso causa sobrescrita do resumo.`);
-  }
   setStatus('Analisando BO...', 'active');
   addLog('Lendo conteúdo do BO', 'info');
   showSection('secAnalysis');
@@ -701,7 +693,10 @@ async function triggerStep3() {
   if (!/relato\s+individual/i.test(currentRelatoText)) {
     addLog('Relato não encontrado no frame principal. Buscando em todos os frames...', 'warning');
     try {
-      const tab = await new Promise(r => chrome.tabs.query({ active: true, currentWindow: true }, tabs => r(tabs[0])));
+      const tabs = await new Promise(r => chrome.tabs.query({ active: true, currentWindow: true }, r));
+      // Filtra para garantir que não estamos tentando injetar no próprio popup ou em páginas protegidas
+      const tab = tabs.find(t => t.url && t.url.includes('sisp.ciasc.sc.gov.br'));
+      
       if (tab) {
         const injectionResults = await chrome.scripting.executeScript({
           target: { tabId: tab.id, allFrames: true },
@@ -731,8 +726,6 @@ async function triggerStep3() {
 }
 
 // STEP 3.1 - Resumir com IA (manual) — texto já extraído no step 3
-let currentRelatoText = '';
-let currentFatos = '';
 
 async function triggerStep3_1() {
   if (!currentTipo) {
