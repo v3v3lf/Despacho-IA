@@ -22,8 +22,26 @@
       <div class="status-bar">
         <div class="status-dot" id="statusDot"></div>
         <span id="statusText">Verificando...</span>
+        <button class="btn-action ghost" id="btnLogout" style="font-size: 10px; margin-left: 5px; padding: 2px 6px; display: none;">Sair</button>
       </div>
     </header>
+
+    <!-- TELA DE LOGIN (aparece se não autenticado) -->
+    <div id="loginScreen" class="login-screen hidden">
+      <div class="login-card">
+        <div class="login-logo">🔐</div>
+        <h2>Despacho <span>IA</span></h2>
+        <p>Acesso restrito. Entre com os mesmos dados da SO-Plataforma.</p>
+        <div class="login-inputs">
+          <input type="email" id="loginEmail" placeholder="Email" autocomplete="username">
+          <input type="password" id="loginSenha" placeholder="Senha" autocomplete="current-password">
+        </div>
+        <button id="btnLogin" class="btn-action primary" style="width: 100%; margin-top: 10px; justify-content: center;">
+          <span id="btnLoginText">Entrar</span>
+        </button>
+        <div id="loginError" class="login-error hidden"></div>
+      </div>
+    </div>
 
     <!-- PAINEL PRINCIPAL: FLUXO -->
     <div id="panelFlow" class="panel active">
@@ -126,6 +144,9 @@
                   <option value="devolucao_veiculo" style="background:#1a2235;color:white;">Devolução Veículo</option>
                   <option value="cnh_sem_perigo" style="background:#1a2235;color:white;">CNH sem perigo</option>
                   <option value="instaurar_ip" style="background:#1a2235;color:white;">Instaurar IP</option>
+                  <option value="imagens" style="background:#1a2235;color:white;">Imagens</option>
+                  <option value="aguardar_outro_elemento" style="background:#1a2235;color:white;">Aguardar outro elemento</option>
+                  <option value="rel_invest_sem_autoria" style="background:#1a2235;color:white;">Rel. Invest. s/ Autoria</option>
                   <option value="oitivas_preliminares_testemunha" style="background:#1a2235;color:white;">(OITIVAS PRELIMINARES-TESTEMUNHA)</option>
                 </select>
               </div>
@@ -264,6 +285,8 @@
     </div>
 
   </div>
+  <script src="supabase-config.js"></script>
+  <script src="auth.js"></script>
   <script src="popup.js"></script>
 </body>
 

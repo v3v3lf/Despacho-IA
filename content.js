@@ -124,6 +124,19 @@ d) Pode fazer o comparecimento pessoal na Delegacia,
   cnh_sem_perigo: `Trata-se de fato atípico, já que não se enquadra ao art 309 (Dirigir sem Habilitação ou com Direito Cassado, gerando perigo de dano), pois não gerou perigo de dano conforme descrito no relato.`,
   instaurar_ip: `Em razão dos elementos constantes no BO instaurar IP`,
   oitivas_preliminares_testemunha: `Intime-se a(s) testemunha(s) para prestar termo de declaração preliminar para maiores informações sobre os fatos. Juntar documentos ou laudos, se houver, depois retorne para ulterior deliberação.`,
+  imagens: `Favor solicitar as imagens do local dos fatos, para esclarecimentos das circunstâncias em que ocorreu o evento.`,
+  aguardar_outro_elemento: `Aguarde-se OUTRO ELEMENTO DE INFORMAÇÃO caracterizador de algum delito.
+Por ora, impossível estabelecer, quanto à vertente notícia-crime, alguma linha investigativa concreta e condizente com níveis mínimos de eficácia a serem exigidos modernamente para a válida (e racional) instauração de qualquer procedimento oficial de persecução criminal.
+Sublinhe-se, in casu, o teor da declaração da vítima é no sentido da absoluta carência de substrato fático criminal razoável à indicação de materialidade e eventual autoria delitiva.
+Por oportuno, não custa lembrar que, segundo entendimento do próprio STF, a instauração regular de procedimento investigativo depende necessariamente de "base empírica para tanto idônea e indicação plausível do fato delituoso a ser apurado" (STF – Primeira Turma – Inq 3847 AgR/GO - Rel. Min. Dias Toffoli – j. em 07.04.2015 – Dje 108 de 05.06.2015 / STF – Primeira Turma – Pet 7354 AgR/DF - Rel. Min. Dias Toffoli – j. em 06.03.2018 – Dje 102 de 24.05.2018), o que inexistente no caso em questão.
+Com efeito, a vedação legal ao poder investigativo em situações dessa natureza decorre, ainda, de eventuais ilações no campo penal por abuso de autoridade (arts. 27 e 30 da Lei n. 13.869/2019). 
+Assim, a pretensão da vítima reputa-se não plausível, conforme exposto acima, e caso a não concorde com o indeferimento de instauração de inquérito policial é possível recurso para o chefe de Polícia, conforme o disposto no art. 5º, § 2º, do CPP (Do despacho que indeferir o requerimento de abertura de inquérito caberá recurso para o chefe de Polícia).`,
+  rel_invest_sem_autoria: `CONFORME RELATÓRIO DE INVESTIGAÇÃO, não foi possível identificar o autor do fato.
+Em que pese diligências prévias, em anexo, realizadas com o fito de angariar elementos mínimos à instauração de procedimento formal de apuração (inquérito policial) que não se apresentasse natimorto, sob o viés jurídico-penal e investigativo operacional, ausentes na espécie condições necessárias para tanto. Por ora, impossível estabelecer, quanto à vertente notícia-crime, alguma linha investigativa concreta e condizente com níveis mínimos de eficácia a serem exigidos modernamente para a válida (e racional) instauração de qualquer procedimento oficial de persecução criminal.
+Sublinhe-se, in casu, conforme o teor do relatório de investigação, todas as diligências cabíveis foram adotadas, não sendo possível identificar o autor do fato, assim, no sentido da absoluta carência de substrato fático criminal razoável à indicação da autoria delitiva. Por oportuno, não custa lembrar que, segundo entendimento do próprio STF, a instauração regular de procedimento investigativo depende necessariamente de "base empírica para tanto idônea e indicação plausível do fato delituoso a ser apurado" (STF – Primeira Turma – Inq 3847 AgR/GO - Rel. Min. Dias Toffoli – j. em 07.04.2015 – Dje 108 de 05.06.2015 / STF – Primeira Turma – Pet 7354 AgR/DF - Rel. Min. Dias Toffoli – j. em 06.03.2018 – Dje 102 de 24.05.2018), o que inexistente no caso em questão.
+Com efeito, a vedação legal ao poder investigativo em situações dessa natureza decorre, ainda, de eventuais ilações no campo penal por abuso de autoridade (arts. 27 e 30 da Lei n. 13.869/2019).
+Assim, a pretensão da vítima reputa-se não plausível, conforme exposto acima, e caso a não concorde com o indeferimento de instauração de inquérito policial é possível recurso para o chefe de Polícia, conforme o disposto no art. 5º, § 2º, do CPP (Do despacho que indeferir o requerimento de abertura de inquérito caberá recurso para o chefe de Polícia).
+Ante todo o exposto, arquive-se, por ora, a vertente notícia-crime, de forma que, havendo novos dados informativos, retorne para providências ulteriores, ou esta autoridade policial poderá proceder a novas pesquisas, se de outras provas tiver notícia.`,
 };
 
 var DETECTION_KEYWORDS = {
@@ -133,7 +146,7 @@ var DETECTION_KEYWORDS = {
   dp_om_atribuicao: ['dp om atribuicao', 'dp com atribuicao', 'dp com atribuição', 'dp om atribuição'],
   decidir_posteriormente: ['decidir posteriormente', 'deseja decidir posteriormente'],
   estelionato: ['estelionato'],
-  queixa: ['calunia', 'difamacao', 'injuria', 'exercicio arbitrario das proprias razoes', 'dano', 'fraude a execucao', 'fraude à execução', 'alteracao de limites', 'alteração de limites', 'esbulho possessorio', 'esbulho possessório', 'introducao ou abandono de animais em propriedade alheia', 'introdução ou abandono de animais em propriedade alheia'],
+  queixa: ['calunia', 'calúnia', 'difamacao', 'difamação', 'injuria', 'injúria', 'exercicio arbitrario das proprias razoes', 'exercício arbitrário das próprias razões', 'dano', 'fraude a execucao', 'fraude à execução', 'alteracao de limites', 'alteração de limites', 'esbulho possessorio', 'esbulho possessório', 'introducao ou abandono de animais em propriedade alheia', 'introdução ou abandono de animais em propriedade alheia'],
   jec_incondicionada: ['vias de fato', 'perturbacao do sossego', 'desobediencia', 'resistencia', 'desacato', 'fuga do local do acidente', 'violacao da suspensao', 'dirigir sem habilitacao', 'entregar veiculo a pessoa nao habilitada', 'trafegar em velocidade incompativel', 'fraude processual no transito'],
   jec_condicionada: ['ameaca', 'ameaça', 'perseguicao', 'outras fraudes', 'omissao de socorro', 'lesao corporal leve', 'lesão corporal leve', 'lesao corporal culposa', 'lesão corporal culposa', 'violacao do segredo profissional', 'violação do segredo profissional', 'invasao de dispositivo informatico', 'invasão de dispositivo informático', 'furto de coisa comum', 'perigo de contagio venereo', 'perigo de contágio venéreo', 'violacao de correspondencia', 'violação de correspondência'],
   oitivas_preliminares: ['apropriacao indebita', 'falsidade documental', 'racismo'],
@@ -145,14 +158,17 @@ var DETECTION_KEYWORDS = {
   estelionato_atribuicao: ['estelionato atribuição', 'estelionato atribuicao', 'estelionato competência', 'estelionato competencia'],
   cnh_sem_perigo: ['309', 'sem habilitação', 'sem perigo de dano'],
   instaurar_ip: [],
-  oitivas_preliminares_testemunha: ['suicídio', 'suicidio']
+  oitivas_preliminares_testemunha: ['suicídio', 'suicidio'],
+  imagens: ['imagens', 'cameras', 'câmeras', 'local dos fatos'],
+  aguardar_outro_elemento: ['outro elemento', 'aguarde-se outro elemento', 'caracterizador de algum delito', 'carência de substrato fático'],
+  rel_invest_sem_autoria: ['relatorio de investigacao', 'relatório de investigação', 'não foi possível identificar o autor', 'sem autoria']
 };
 
 var DETECTION_PRIORITY = [
   'fato_atipico', 'vitima_nao_representar', 'pericia', 'dp_om_atribuicao',
   'decidir_posteriormente', 'estelionato', 'queixa',
   'jec_incondicionada', 'jec_condicionada', 'oitivas_preliminares', 'investigacao',
-  'desacordo_comercial', 'fraude', 'estelionato_atribuicao', 'conflito_visitacao', 'devolucao_veiculo', 'cnh_sem_perigo', 'instaurar_ip', 'oitivas_preliminares_testemunha'
+  'desacordo_comercial', 'fraude', 'estelionato_atribuicao', 'conflito_visitacao', 'devolucao_veiculo', 'cnh_sem_perigo', 'instaurar_ip', 'oitivas_preliminares_testemunha', 'imagens', 'aguardar_outro_elemento', 'rel_invest_sem_autoria'
 ];
 
 // ============================

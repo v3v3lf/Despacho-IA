@@ -41,7 +41,19 @@ Para a vítima informar onde foi o local em que ocorreu a ENTREGA A MERCADORIA (
   devolucao_veiculo: `1 - Verificar onde o veículo se encontra;\n2 - Fazer contato com o proprietário, caso este veículo não tenha sido entregue:\n3 - Analisar os documentos pessoais de propriedade do automóvel;\n4 - Caso esteja regular a documentação, proceder a realização do termo de entrega do veículo, inserindo no SISP;\n5 - Inserir os documentos (termo de entrega e documentos pessoais do proprietário e do veículo) no sistema para baixa no Detrannet/BIN.`,
   cnh_sem_perigo: `Trata-se de fato atípico, já que não se enquadra ao art 309 (Dirigir sem Habilitação ou com Direito Cassado, gerando perigo de dano), pois não gerou perigo de dano conforme descrito no relato.`,
   oitivas_preliminares_testemunha: `Intime-se a(s) testemunha(s) para prestar termo de declaração preliminar para maiores informações sobre os fatos. Juntar documentos ou laudos, se houver, depois retorne para ulterior deliberação.`,
-  instaurar_ip: `Em razão dos elementos constantes no BO instaurar IP`,
+  imagens: `Favor solicitar as imagens do local dos fatos, para esclarecimentos das circunstâncias em que ocorreu o evento.`,
+  aguardar_outro_elemento: `Aguarde-se OUTRO ELEMENTO DE INFORMAÇÃO caracterizador de algum delito.
+Por ora, impossível estabelecer, quanto à vertente notícia-crime, alguma linha investigativa concreta e condizente com níveis mínimos de eficácia a serem exigidos modernamente para a válida (e racional) instauração de qualquer procedimento oficial de persecução criminal.
+Sublinhe-se, in casu, o teor da declaração da vítima é no sentido da absoluta carência de substrato fático criminal razoável à indicação de materialidade e eventual autoria delitiva.
+Por oportuno, não custa lembrar que, segundo entendimento do próprio STF, a instauração regular de procedimento investigativo depende necessariamente de "base empírica para tanto idônea e indicação plausível do fato delituoso a ser apurado" (STF – Primeira Turma – Inq 3847 AgR/GO - Rel. Min. Dias Toffoli – j. em 07.04.2015 – Dje 108 de 05.06.2015 / STF – Primeira Turma – Pet 7354 AgR/DF - Rel. Min. Dias Toffoli – j. em 06.03.2018 – Dje 102 de 24.05.2018), o que inexistente no caso em questão.
+Com efeito, a vedação legal ao poder investigativo em situações dessa natureza decorre, ainda, de eventuais ilações no campo penal por abuso de autoridade (arts. 27 e 30 da Lei n. 13.869/2019). 
+Assim, a pretensão da vítima reputa-se não plausível, conforme exposto acima, e caso a não concorde com o indeferimento de instauração de inquérito policial é possível recurso para o chefe de Polícia, conforme o disposto no art. 5º, § 2º, do CPP (Do despacho que indeferir o requerimento de abertura de inquérito caberá recurso para o chefe de Polícia).`,
+  rel_invest_sem_autoria: `CONFORME RELATÓRIO DE INVESTIGAÇÃO, não foi possível identificar o autor do fato.
+Em que pese diligências prévias, em anexo, realizadas com o fito de angariar elementos mínimos à instauração de procedimento formal de apuração (inquérito policial) que não se apresentasse natimorto, sob o viés jurídico-penal e investigativo operacional, ausentes na espécie condições necessárias para tanto. Por ora, impossível estabelecer, quanto à vertente notícia-crime, alguma linha investigativa concreta e condizente com níveis mínimos de eficácia a serem exigidos modernamente para a válida (e racional) instauração de qualquer procedimento oficial de persecução criminal.
+Sublinhe-se, in casu, conforme o teor do relatório de investigação, todas as diligências cabíveis foram adotadas, não sendo possível identificar o autor do fato, assim, no sentido da absoluta carência de substrato fático criminal razoável à indicação da autoria delitiva. Por oportuno, não custa lembrar que, segundo entendimento do próprio STF, a instauração regular de procedimento investigativo depende necessariamente de "base empírica para tanto idônea e indicação plausível do fato delituoso a ser apurado" (STF – Primeira Turma – Inq 3847 AgR/GO - Rel. Min. Dias Toffoli – j. em 07.04.2015 – Dje 108 de 05.06.2015 / STF – Primeira Turma – Pet 7354 AgR/DF - Rel. Min. Dias Toffoli – j. em 06.03.2018 – Dje 102 de 24.05.2018), o que inexistente no caso em questão.
+Com efeito, a vedação legal ao poder investigativo em situações dessa natureza decorre, ainda, de eventuais ilações no campo penal por abuso de autoridade (arts. 27 e 30 da Lei n. 13.869/2019).
+Assim, a pretensão da vítima reputa-se não plausível, conforme exposto acima, e caso a não concorde com o indeferimento de instauração de inquérito policial é possível recurso para o chefe de Polícia, conforme o disposto no art. 5º, § 2º, do CPP (Do despacho que indeferir o requerimento de abertura de inquérito caberá recurso para o chefe de Polícia).
+Ante todo o exposto, arquive-se, por ora, a vertente notícia-crime, de forma que, havendo novos dados informativos, retorne para providências ulteriores, ou esta autoridade policial poderá proceder a novas pesquisas, se de outras provas tiver notícia.`,
 };
 
 const TIPO_LABELS = {
@@ -64,6 +76,9 @@ const TIPO_LABELS = {
   cnh_sem_perigo: 'CNH sem perigo',
   oitivas_preliminares_testemunha: 'Oitivas Prelim.-Testemunha',
   instaurar_ip: 'Instaurar IP',
+  imagens: 'Imagens',
+  aguardar_outro_elemento: 'Aguardar outro elemento',
+  rel_invest_sem_autoria: 'Rel. Invest. s/ Autoria',
 };
 
 const FATO_OPTIONS = [
@@ -86,6 +101,9 @@ const FATO_OPTIONS = [
   { value: 'devolucao_veiculo', label: 'DEVOLUÇÃO VEÍCULO' },
   { value: 'cnh_sem_perigo', label: 'CNH SEM PERIGO' },
   { value: 'instaurar_ip', label: 'INSTAURAR IP' },
+  { value: 'imagens', label: 'IMAGENS' },
+  { value: 'aguardar_outro_elemento', label: 'AGUARDAR OUTRO ELEMENTO' },
+  { value: 'rel_invest_sem_autoria', label: 'REL. INVEST. S/ AUTORIA' },
 ];
 
 // ---- STATE ----
@@ -138,8 +156,8 @@ function getAiConfigFromUI() {
   const keyInput = document.getElementById('googleApiKeyInput');
   const modelInput = document.getElementById('geminiModelInput');
   return {
-    googleApiKey: keyInput ? keyInput.value.trim() : googleApiKey,
-    geminiModel: (modelInput ? modelInput.value : geminiModel) || DEFAULT_GEMINI_MODEL
+    googleApiKey: keyInput ? keyInput.value.trim() : (googleApiKey || ''),
+    geminiModel: (modelInput ? modelInput.value : (geminiModel || DEFAULT_GEMINI_MODEL))
   };
 }
 
@@ -290,16 +308,60 @@ ${textoRelato.slice(0, limit)}`;
 }
 
 // ---- INIT ----
-chrome.storage.local.get(['rules', 'logs', 'googleApiKey', 'geminiModel'], data => {
-  rules = data.rules || [];
-  logs = data.logs || [];
-  googleApiKey = data.googleApiKey || '';
-  geminiModel = data.geminiModel || DEFAULT_GEMINI_MODEL;
-  loadAiConfigUI();
-  renderRules();
-  renderLogs();
-  checkTab();
-});
+async function initApp() {
+  // 1. Resetar estado do fluxo para garantir início limpo (conforme solicitado pelo usuário)
+  currentTipo = null;
+  currentDespacho = null;
+  currentPolicial = null;
+  currentResumoIA = null;
+  currentRelatoText = '';
+  currentFatos = '';
+  isAutoMode = false;
+
+  // 2. Verifica Autenticação primeiro
+  const sessao = await Auth.verificarSessao();
+  
+  // Carrega o email salvo mesmo se não estiver autenticado (para preencher o campo de login)
+  chrome.storage.local.get(['sessao_email'], data => {
+    const emailInput = document.getElementById('loginEmail');
+    if (emailInput && data.sessao_email) {
+      emailInput.value = data.sessao_email;
+    }
+  });
+
+  if (!sessao.autenticado) {
+    // Se não está logado, esconde tudo e mostra o login
+    document.getElementById('loginScreen').classList.remove('hidden');
+    document.getElementById('panelFlow').classList.add('hidden');
+    document.getElementById('panelConfig').classList.add('hidden');
+    document.querySelector('.bottom-nav').style.display = 'none';
+    document.getElementById('btnLogout').style.display = 'none';
+    return; // Para a execução aqui
+  }
+
+  // 3. Está logado: exibe interface normal e botão de sair
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('panelFlow').classList.remove('hidden');
+  document.querySelector('.bottom-nav').style.display = 'flex';
+  document.getElementById('btnLogout').style.display = 'block';
+
+  // 4. Carrega configurações e regras locais
+  chrome.storage.local.get(['rules', 'logs', 'googleApiKey', 'geminiModel'], data => {
+    // Só atribui se houver dados, evitando resetar para vazio por erro de leitura
+    if (data.rules) rules = data.rules;
+    if (data.logs) logs = data.logs;
+    if (data.googleApiKey) googleApiKey = data.googleApiKey;
+    if (data.geminiModel) geminiModel = data.geminiModel;
+
+    loadAiConfigUI();
+    renderRules();
+    renderLogs();
+    checkTab();
+  });
+}
+
+// Inicia o app
+initApp();
 
 // Listen for events from content script (via background)
 chrome.runtime.onMessage.addListener(msg => {
@@ -809,7 +871,11 @@ document.getElementById('btnRegrasToggle').addEventListener('click', () => {
 });
 
 // ---- RULES ----
-function saveRules() { chrome.storage.local.set({ rules }); }
+function saveRules() { 
+  chrome.storage.local.set({ rules }, () => {
+    console.log('[Despacho IA] Regras salvas com sucesso');
+  }); 
+}
 
 function renderRules() {
   const c = document.getElementById('rulesContainer');
@@ -940,4 +1006,49 @@ document.getElementById('selectManualTipo').addEventListener('change', async (e)
   await sendToTab('STEP4_INSERT_DESPACHO', { despacho: currentDespacho, rules });
   // Reset select para o label padrão
   e.target.value = '';
+});
+
+// ---- AUTENTICAÇÃO ----
+document.getElementById('btnLogin').addEventListener('click', async () => {
+  const email = document.getElementById('loginEmail').value;
+  const senha = document.getElementById('loginSenha').value;
+  const errorDiv = document.getElementById('loginError');
+  const btnText = document.getElementById('btnLoginText');
+
+  if (!email || !senha) {
+    errorDiv.textContent = 'Preencha email e senha.';
+    errorDiv.classList.remove('hidden');
+    return;
+  }
+
+  errorDiv.classList.add('hidden');
+  btnText.textContent = 'Verificando...';
+  document.getElementById('btnLogin').disabled = true;
+
+  const res = await Auth.login(email, senha);
+
+  if (res.ok) {
+    // Reload UI state via initApp
+    initApp();
+  } else {
+    errorDiv.textContent = res.erro;
+    errorDiv.classList.remove('hidden');
+  }
+
+  btnText.textContent = 'Entrar';
+  document.getElementById('btnLogin').disabled = false;
+});
+
+document.getElementById('btnLogout').addEventListener('click', async () => {
+  await Auth.logout();
+  // Limpa campos
+  document.getElementById('loginEmail').value = '';
+  document.getElementById('loginSenha').value = '';
+  document.getElementById('loginError').classList.add('hidden');
+  
+  // Reseta estado
+  isAutoMode = false;
+  
+  // Chama initApp para esconder tudo e mostrar tela de login
+  initApp();
 });

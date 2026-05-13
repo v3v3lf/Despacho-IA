@@ -1,0 +1,3 @@
+// Configurações públicas do Supabase (Mesmo banco da SO-Plataforma)
+const SUPABASE_URL = 'https://stsdwmaerbyfmgfcfgdv.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0c2R3bWFlcmJ5Zm1nZmNmZ2R2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQzMzY4MDMsImV4cCI6MjA3OTkxMjgwM30.b1We_OuB2BGOXzBA0TjbUGd1oizwulF_4Zzr1kyQ5_I';
