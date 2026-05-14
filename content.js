@@ -102,7 +102,7 @@ function frameType() {
 var DESPACHOS = {
   fato_atipico: 'O Boletim de Ocorrência narra FATO ATÍPICO. Segundo entendimento do próprio STF, a instauração regular de procedimento investigativo depende necessariamente de "base empírica para tanto idônea e indicação plausível do fato delituoso a ser apurado", o que inexiste no caso em questão.(STF – Primeira Turma – Inq 3847 AgR/GO - Rel. Min. Dias Toffoli – j. em 07.04.2015 – Dje 108 de 05.06.2015 / STF – Primeira Turma – Pet 7354 AgR/DF - Rel. Min. Dias Toffoli – j. em 06.03.2018 – Dje 102 de 24.05.2018) Com efeito, a vedação legal ao poder investigativo em situações dessa natureza decorre, ainda, de eventuais ilações no campo penal por abuso de autoridade (arts. 27 e 30 da Lei n. 13.869/2019).',
   vitima_nao_representar: 'Conforme consta no Boletim de Ocorrência, a vítima não deseja não exercer o direito de representação ou queixa contra o autor.   Segundo entendimento do próprio STF, a instauração regular de procedimento investigativo depende necessariamente de "base empírica para tanto idônea e indicação plausível do fato delituoso a ser apurado", o que inexiste no caso em questão.(STF – Primeira Turma – Inq 3847 AgR/GO - Rel. Min. Dias Toffoli – j. em 07.04.2015 – Dje 108 de 05.06.2015 / STF – Primeira Turma – Pet 7354 AgR/DF - Rel. Min. Dias Toffoli – j. em 06.03.2018 – Dje 102 de 24.05.2018) Com efeito, a vedação legal ao poder investigativo em situações dessa natureza decorre, ainda, de eventuais ilações no campo penal por abuso de autoridade (arts. 27 e 30 da Lei n. 13.869/2019).',
-  pericia: 'Requisite-se para Polícia Científica exame pericial no local dos fatos mencionado no BO, e solicite-se o envio do laudo pericial a esta Delegacia, depois retorne para este signatário para nova apreciação.',
+  pericia: 'Requisite-se para Polícia Científica exame pericial no objeto ou local dos fatos mencionado no BO, e solicite-se o envio do laudo pericial a esta Delegacia, depois retorne para este signatário para nova apreciação.',
   dp_om_atribuicao: 'Exmo. (a) Senhor (a) Delegado (a),\nCumprimentando-o (a) cordialmente, encaminho o Boletim de Ocorrência a Vossa Excelência para ciência e providências que achar cabíveis.\nNa oportunidade, renovo protestos de elevada estima e distinta consideração.\nRespeitosamente,',
   decidir_posteriormente: 'VISTOS (Decidir posteriormente). \nAGUARDE-SE A MANIFESTACAO DA VITIMA no prazo decadencial, conforme a cientificacao constante no Boletim de Ocorrencia, em que a vitima Deseja Decidir posteriormente sobre o direito de representacao ou queixa, estando ciente de que o prazo para oferecer a representacao ou a queixa e de 06 (seis) meses, contados da data do fato ou da data em que vier a saber quem e o autor do fato. Pois, nos termos do artigo 5o do CPP: "Par. 4o O inquerito, nos crimes em que a acao publica depender de representacao, nao podera sem ela ser iniciado.; e, \nPar. 5o Nos crimes de acao privada, a autoridade policial somente podera proceder a inquerito a requerimento de quem tenha qualidade para intenta-la."',
   investigacao: 'Efetuar a VERIFICACAO PRELIMINAR DAS INFORMACOES do presente Boletim de Ocorrencia para a identificacao do autor(es), de acordo com as informacoes trazidas, dos termos do artigo 5o, paragrafo 3o do CPP. Caso as diligencias investigatorias realizadas nao seja possivel identificar o(s) autor(es), aguarde-se outro elemento de informacao caracterizador da autoria do delito, nao necessitando realizar nova tramitacao, pois em face da carencia de substrato fatico criminal razoavel a indicacao de da autoria delitiva. Por oportuno, nao custa lembrar que, segundo entendimento do proprio STF, a instauracao regular de procedimento investigativo depende necessariamente de "base empirica para tanto idonea e indicacao plausivel do fato delituoso a ser apurado" (STF - Primeira Turma - Inq 3847 AgR/GO - Rel. Min. Dias Toffoli - j. em 07.04.2015 - Dje 108 de 05.06.2015 / STF - Primeira Turma - Pet 7354 AgR/DF - Rel. Min. Dias Toffoli - j. em 06.03.2018 - Dje 102 de 24.05.2018), o que inexiste no caso em questao.',
@@ -782,6 +782,10 @@ async function step4_insertDespacho(despacho) {
     await fecharModaisRelatorio();
     await sleep(300);
 
+    // PASSO 0.5: Garantir que o painel de encaminhamento esteja aberto
+    await tentarAbrirPainelEncaminhamento();
+    await sleep(400);
+
     var editorEl = encontrarEditorDespacho();
 
     if (!editorEl) {
@@ -790,12 +794,14 @@ async function step4_insertDespacho(despacho) {
       if (!btnIncluir) {
         log('Botao "+ Incluir" do Encaminhamento Interno nao encontrado', 'error');
         // Diagnostico
-        log('DIAG-HTML: ' + (function () {
+        var diagHtml = (function () {
           var idx = document.body.innerHTML.indexOf('Encaminhamento Interno');
           if (idx < 0) return '(Encaminhamento Interno nao encontrado no HTML)';
-          return document.body.innerHTML.substring(Math.max(0, idx - 50), idx + 800);
-        })(), 'error');
-        notify('STEP_ERROR', { step: 4, msg: 'Botao "+ Incluir" nao encontrado apos Encaminhamento Interno' });
+          return document.body.innerHTML.substring(Math.max(0, idx - 50), idx + 800).replace(/<[^>]*>/g, ' ');
+        })();
+        log('DIAG-HTML (texto): ' + diagHtml.substring(0, 500), 'error');
+        
+        notify('STEP_ERROR', { step: 4, msg: 'Botao "+ Incluir" nao encontrado. Verifique se o painel "Encaminhamento Interno" esta aberto.' });
         return;
       }
 
@@ -859,6 +865,7 @@ function encontrarBotaoIncluirEncaminhamento() {
   // Estrategia 1: buscar pelo label e subir para o container, procurar botao azul dentro
   var labelEl = encontrarLabelInterno();
   if (labelEl) {
+    log('Label interno encontrado: "' + labelEl.textContent.trim() + '"', 'info');
     var container = labelEl;
     for (var up = 0; up < 8; up++) {
       if (!container.parentElement) break;
@@ -912,7 +919,10 @@ function encontrarEditorDespacho() {
     var r = el.getBoundingClientRect();
     return r.width > 0 && r.height > 0 && !el.disabled;
   });
-  if (textareas.length > 0) return textareas[0];
+  if (textareas.length > 0) {
+    log('encontrarEditorDespacho: encontrado textarea visivel', 'info');
+    return textareas[0];
+  }
 
   // Procurar contenteditable visivel
   var editaveis = Array.from(document.querySelectorAll('[contenteditable="true"]')).filter(function (el) {
@@ -1146,6 +1156,13 @@ function findEditor() {
 // Insere texto num elemento editor detectado
 async function insertInEditor(el, text) {
   try {
+    if (!el) return false;
+    if (!text) {
+      log('insertInEditor: texto vazio, ignorando', 'warning');
+      return false;
+    }
+    log('insertInEditor: inserindo ' + text.length + ' caracteres', 'info');
+    
     el.focus();
     var tag = el.tagName.toLowerCase();
     var isContentEditable = el.isContentEditable || el.getAttribute('contenteditable') === 'true';
@@ -1176,7 +1193,7 @@ async function insertInEditor(el, text) {
       el.dispatchEvent(new InputEvent('input', { bubbles: true, cancelable: true }));
       el.dispatchEvent(new Event('change', { bubbles: true }));
       el.dispatchEvent(new Event('blur', { bubbles: true }));
-      log('insertInEditor: texto inserido via execCommand/paste em ' + tag, 'info');
+      log('insertInEditor: texto inserido via execCommand/paste em ' + tag + ' (successHtml=' + successHtml + ')', 'info');
       return true;
     }
 
