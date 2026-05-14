@@ -576,7 +576,7 @@ function onStepDone(step) {
     addLog('Despacho salvo! Clique em "Resolver" para marcar como resolvido.', 'success');
   }
   if (step === 7) {
-    showSection('secDone');
+    show('secDone');
     setStatus('Concluído! ✓', 'success');
   }
 }
