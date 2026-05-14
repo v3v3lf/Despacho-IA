@@ -552,24 +552,17 @@ function onStepDone(step) {
   }
   if (step === 4) {
     showSection('secDestinatario');
-    showSection('secSalvar');
-    showSection('secResolver');
     addLog('Despacho inserido com sucesso no campo de Encaminhamento Interno ✓', 'success');
     setStatus('Despacho inserido ✓ — adicione destinatário ou salve', 'success');
   }
   if (step === 5) {
-    showSection('secSalvar');
-    showSection('secResolver');
     setStatus('Destinatário adicionado ✓', 'success');
   }
   if (step === 6) {
     setStatus('Salvo ✓ — clique em Resolver para finalizar', 'success');
     addLog('Despacho salvo! Clique em "Resolver" para marcar como resolvido.', 'success');
-    showSection('secResolver');
   }
   if (step === 7) {
-    hide('secSalvar');
-    hide('secResolver');
     showSection('secDone');
     setStatus('Concluído! ✓', 'success');
   }
@@ -622,7 +615,7 @@ document.getElementById('btnStart').addEventListener('click', async () => {
     return;
   }
   // Reset flow
-  hide('secAnalysis'); hide('secResumoIA'); hide('secDestinatario'); hide('secSalvar'); hide('secResolver'); hide('secDone');
+  hide('secAnalysis'); hide('secResumoIA'); hide('secDestinatario'); hide('secDone');
   document.getElementById('analysisBox').innerHTML = '<div style="color: #64748b; font-size: 13px;">Clique no botão acima para gerar o resumo com IA.</div>';
   hide('despachoSuggestion');
   document.getElementById('selectManualTipo').value = '';
@@ -723,6 +716,7 @@ async function triggerStep3() {
   }
 
   setStatus('BO analisado — aguardando sua ação', 'success');
+  onStepDone(3);
 }
 
 // STEP 3.1 - Resumir com IA (manual) — texto já extraído no step 3
@@ -778,17 +772,6 @@ document.getElementById('btnAddDestinatario').addEventListener('click', async ()
   await sendToTab('STEP5_INCLUIR_DESTINATARIO', { policial });
 });
 
-// STEP 6 - Save
-document.getElementById('btnSalvar').addEventListener('click', async () => {
-  setStatus('Salvando...', 'active');
-  await sendToTab('STEP6_SALVAR');
-});
-
-// STEP 7 - Mark as resolved
-document.getElementById('btnResolver').addEventListener('click', async () => {
-  setStatus('Encerrando BO...', 'active');
-  await sendToTab('STEP7_RESOLVER');
-});
 
 // Next BO
 document.getElementById('btnNext').addEventListener('click', async () => {
@@ -801,7 +784,7 @@ document.getElementById('btnNext').addEventListener('click', async () => {
     return;
   }
   // Reset flow
-  hide('secAnalysis'); hide('secResumoIA'); hide('secDestinatario'); hide('secSalvar'); hide('secResolver'); hide('secDone');
+  hide('secAnalysis'); hide('secResumoIA'); hide('secDestinatario'); hide('secDone');
   document.getElementById('analysisBox').innerHTML = '<div style="color: #64748b; font-size: 13px;">Clique no botão acima para gerar o resumo com IA.</div>';
   hide('despachoSuggestion');
   document.getElementById('selectManualTipo').value = '';
@@ -927,7 +910,7 @@ document.getElementById('btnResetManual').addEventListener('click', (e) => {
   isAutoMode = false;
   
   // Limpa a interface de análise e resultados
-  hide('secAnalysis'); hide('secResumoIA'); hide('secDestinatario'); hide('secSalvar'); hide('secResolver'); hide('secDone');
+  hide('secAnalysis'); hide('secResumoIA'); hide('secDestinatario'); hide('secDone');
   document.getElementById('analysisBox').innerHTML = '<div style="color: #64748b; font-size: 13px;">Clique no botão acima para gerar o resumo com IA.</div>';
   hide('despachoSuggestion');
   document.getElementById('selectManualTipo').value = '';
@@ -968,8 +951,16 @@ document.getElementById('btnM5').addEventListener('click', async () => {
   await sendToTab('STEP5_INCLUIR_DESTINATARIO', { policial: pol });
 });
 
-document.getElementById('btnM6').addEventListener('click', async () => { isAutoMode = false; await sendToTab('STEP6_SALVAR'); });
-document.getElementById('btnM7').addEventListener('click', async () => { isAutoMode = false; await sendToTab('STEP7_RESOLVER'); });
+document.getElementById('btnM6').addEventListener('click', async () => { 
+  isAutoMode = false; 
+  setStatus('Salvando...', 'active');
+  await sendToTab('STEP6_SALVAR'); 
+});
+document.getElementById('btnM7').addEventListener('click', async () => { 
+  isAutoMode = false; 
+  setStatus('Encerrando BO...', 'active');
+  await sendToTab('STEP7_RESOLVER'); 
+});
 
 // ---- INSERIR OUTRO DESPACHO ----
 document.getElementById('selectManualTipo').addEventListener('change', async (e) => {
