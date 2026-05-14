@@ -201,6 +201,14 @@ function fastClick(el) {
   return true;
 }
 
+function isVisibleElement(el) {
+  if (!el) return false;
+  var r = el.getBoundingClientRect ? el.getBoundingClientRect() : { width: 0, height: 0 };
+  var st = window.getComputedStyle ? window.getComputedStyle(el) : null;
+  // Se r.width/height são 0, o elemento não está renderizado ou está display:none
+  return (!st || (st.display !== 'none' && st.visibility !== 'hidden')) && (r.width > 0 || r.height > 0);
+}
+
 // Cache para texto do BO (evita múltiplas chamadas a innerText)
 var cachedBoText = null;
 var cachedBoTextTime = 0;
@@ -331,32 +339,58 @@ async function step1_clickFirstBO() {
   await waitForAngular('table tbody tr, tbody tr, [class*="pendente"]', 12000);
   await sleep(400);
 
-  // Clicar em "Pendentes"
-  var allEls = Array.from(document.querySelectorAll('*'));
-  var recebidos = null;
+  // Clicar em "Pendentes" (Prioriza o visível para suportar ambas as abas: Recebidos e Registros)
+  var allEls = Array.from(document.querySelectorAll('button, a, label, span, mat-tab-label, .mat-tab-label-content'));
+  var pendentesBtn = null;
+  
+  log('Buscando botão "Pendentes" entre ' + allEls.length + ' elementos...', 'info');
+
+  // Tenta encontrar o botão EXATO e VISÍVEL primeiro
   for (var i = 0; i < allEls.length; i++) {
     var txt = allEls[i].textContent.trim().toLowerCase();
-    if (txt === 'pendentes' || txt === 'pendente') { recebidos = allEls[i]; break; }
+    if ((txt === 'pendentes' || txt === 'pendente') && isVisibleElement(allEls[i])) {
+      pendentesBtn = allEls[i];
+      log('Botão "Pendentes" visível encontrado.', 'info');
+      break;
+    }
   }
-  if (!recebidos) {
+
+  // Se não achou exato visível, tenta qualquer um que contenha o texto e seja visível
+  if (!pendentesBtn) {
     for (var i2 = 0; i2 < allEls.length; i2++) {
       var txt2 = allEls[i2].textContent.toLowerCase();
-      if (txt2.includes('pendentes') &&
-        allEls[i2].tagName !== 'BODY' && allEls[i2].tagName !== 'HTML' && allEls[i2].tagName !== 'SCRIPT') { 
-        recebidos = allEls[i2]; 
+      if (txt2.includes('pendente') && isVisibleElement(allEls[i2])) {
+        pendentesBtn = allEls[i2];
+        log('Botão contendo "pendente" visível encontrado.', 'info');
+        break;
+      }
+    }
+  }
+
+  // Fallback se nada visível for encontrado: pega o primeiro do DOM (comportamento antigo)
+  if (!pendentesBtn) {
+    log('Nenhum botão "Pendentes" visível. Tentando fallback no DOM...', 'warning');
+    for (var i3 = 0; i3 < allEls.length; i3++) {
+      var txt3 = allEls[i3].textContent.trim().toLowerCase();
+      if (txt3 === 'pendentes' || txt3 === 'pendente') { 
+        pendentesBtn = allEls[i3]; 
+        log('Botão "Pendentes" encontrado via fallback (pode não estar visível).', 'warning');
         break; 
       }
     }
   }
-  if (recebidos) {
-    log('Clicando "Pendentes"...', 'info');
-    fastClick(recebidos);
-    var par = recebidos.closest('label');
-    if (par && par !== recebidos) fastClick(par);
+
+  if (pendentesBtn) {
+    log('Clicando em "Pendentes"...', 'info');
+    fastClick(pendentesBtn);
+    // Tenta clicar no pai label ou mat-tab se for um radio/aba escondida
+    var par = pendentesBtn.closest('label') || pendentesBtn.closest('mat-tab-label') || pendentesBtn.closest('.mat-tab-label');
+    if (par && par !== pendentesBtn) fastClick(par);
+    
     await waitForAngular('tbody tr', 8000);
-    await sleep(400);
+    await sleep(600);
   } else {
-    log('"Pendentes" nao encontrado', 'warning');
+    log('Botão "Pendentes" não localizado. Verifique se a aba de Despachos está aberta.', 'warning');
   }
 
   // Encontrar primeira linha de BO
@@ -365,10 +399,12 @@ async function step1_clickFirstBO() {
     var rows = tbody.querySelectorAll('tr');
     log('Linhas no tbody: ' + rows.length, 'info');
     for (var r = 0; r < rows.length; r++) {
+      if (r < 5) log('Verificando linha ' + r + ': ' + rows[r].textContent.trim().substring(0, 60), 'info');
       if (isBoRow(rows[r])) {
         var cells = rows[r].querySelectorAll('td');
-        fastClick(cells[2] || cells[1] || cells[0] || rows[r]);
-        log('Linha de BO clicada: "' + rows[r].textContent.trim().substring(0, 80) + '"', 'success');
+        var clickTarget = cells[2] || cells[1] || cells[0] || rows[r];
+        fastClick(clickTarget);
+        log('Linha de BO identificada e clicada: "' + rows[r].textContent.trim().substring(0, 80) + '"', 'success');
         notify('STEP_DONE', { step: 1 });
         return;
       }
@@ -472,12 +508,6 @@ function cleanBoText(text) {
     .trim();
 }
 
-function isVisibleElement(el) {
-  if (!el) return false;
-  var r = el.getBoundingClientRect ? el.getBoundingClientRect() : { width: 1, height: 1 };
-  var st = window.getComputedStyle ? window.getComputedStyle(el) : null;
-  return (!st || (st.display !== 'none' && st.visibility !== 'hidden')) && (r.width > 0 || r.height > 0);
-}
 
 function getFormTextCandidates(root) {
   root = root || document;
@@ -1697,7 +1727,7 @@ async function step6_salvar() {
     log('Salvando despacho...', 'info');
 
     // Estrategia 1: Botao com texto "Salvar" ou "Gravar"
-    var btn = findByText('button,a', 'Salvar') || findByText('button,a', 'Gravar') || findByText('button,a', 'Salvar Alterações');
+    var btn = findByText('button,a', 'Salvar') || findByText('button,a', 'Gravar') || findByText('button,a', 'Salvar Alterações') || findByText('button,a', 'encaminhar externamente');
 
     // Estrategia 2: Botao de sucesso (verde/azul) visivel
     if (!btn) {
@@ -1728,7 +1758,7 @@ async function step7_resolver() {
   await sleep(500);
 
   // Variaveis de texto para o botao de resolver
-  var texts = ['Marcar como resolvido', 'Marcar Resolvido', 'Resolvido', 'Encerrar', 'Concluir'];
+  var texts = ['Marcar como resolvido', 'Marcar Resolvido', 'Resolvido', 'Encerrar', 'Concluir', 'Sim'];
   var btn = null;
 
   for (var i = 0; i < texts.length; i++) {
