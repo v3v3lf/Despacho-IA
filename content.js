@@ -162,7 +162,7 @@ var DETECTION_KEYWORDS = {
   cnh_sem_perigo: ['309', 'sem habilitação', 'sem perigo de dano'],
   instaurar_ip: [],
   oitivas_preliminares_testemunha: ['suicídio', 'suicidio'],
-  imagens: ['imagens', 'cameras', 'câmeras', 'local dos fatos'],
+  imagens: [],
   aguardar_outro_elemento: ['outro elemento', 'aguarde-se outro elemento', 'caracterizador de algum delito', 'carência de substrato fático'],
   rel_invest_sem_autoria: ['relatorio de investigacao', 'relatório de investigação', 'não foi possível identificar o autor', 'sem autoria']
 };
