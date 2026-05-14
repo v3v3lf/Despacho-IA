@@ -190,8 +190,12 @@ function log(msg, level) {
 }
 
 function findByText(selector, text) {
+  var t = (text || '').toLowerCase();
   return Array.from(document.querySelectorAll(selector))
-    .find(function (el) { return el.textContent.trim().includes(text); });
+    .find(function (el) {
+      var content = (el.textContent || '').trim().toLowerCase();
+      return content.includes(t);
+    });
 }
 
 function fastClick(el) {
@@ -1726,12 +1730,23 @@ async function step6_salvar() {
   try {
     log('Salvando despacho...', 'info');
 
-    // Estrategia 1: Botao com texto "Salvar" ou "Gravar"
-    var btn = findByText('button,a', 'Salvar') || findByText('button,a', 'Gravar') || findByText('button,a', 'Salvar Alterações') || findByText('button,a', 'encaminhar externamente');
+    // Estrategia 1: Botao com texto "Salvar", "Gravar" ou "Encaminhar"
+    var btn = findByText('button,a', 'Salvar') || 
+              findByText('button,a', 'Gravar') || 
+              findByText('button,a', 'Salvar Alterações') || 
+              findByText('button,a', 'encaminhar externamente') ||
+              findByText('button,a', 'encaminhar');
 
-    // Estrategia 2: Botao de sucesso (verde/azul) visivel
+    // Estrategia 2: Botao de sucesso (verde/azul) visivel - filtrando seletores de unidade
     if (!btn) {
-      btn = document.querySelector('button.btn-success, button.btn-primary:not([title*="Incluir"])');
+      btn = Array.from(document.querySelectorAll('button.btn-success, button.btn-primary:not([title*="Incluir"])'))
+        .find(function(b) {
+          var t = (b.textContent || '').toLowerCase();
+          var isVisible = b.getBoundingClientRect().width > 0 || b.offsetParent !== null;
+          // Ignorar se o botão for de "Escolher unidade"
+          var isUnitPicker = t.includes('escolher') || t.includes('unidade');
+          return isVisible && !isUnitPicker;
+        });
     }
 
     if (btn) {
