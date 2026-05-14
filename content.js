@@ -70,17 +70,20 @@ function isListFrame() {
   if (!hasTable) return false;
 
   var text = '';
-  try { text = document.body.innerText || ''; } catch (e) { return false; }
+  try { text = (document.body.innerText || '').toLowerCase(); } catch (e) { return false; }
 
   // Pattern for BO number (e.g. 123/2023 or 1234/2024)
   var hasBoPattern = /\d+\/\d{4}/.test(text);
 
   // High confidence markers for list
   var hasListMarkers = (
-    text.includes('Pendentes') ||
-    text.includes('Recebidos') ||
-    text.includes('Aguardando') ||
-    (text.includes('BO') && hasBoPattern)
+    text.includes('pendentes') ||
+    text.includes('recebidos') ||
+    text.includes('aguardando') ||
+    text.includes('registros desta unidade') ||
+    text.includes('recebidos de outras unidades') ||
+    text.includes('administração de despachos') ||
+    (text.includes('bo') && hasBoPattern)
   );
 
   return hasListMarkers;
@@ -332,12 +335,17 @@ async function step1_clickFirstBO() {
   var allEls = Array.from(document.querySelectorAll('*'));
   var recebidos = null;
   for (var i = 0; i < allEls.length; i++) {
-    if (allEls[i].textContent.trim() === 'Pendentes') { recebidos = allEls[i]; break; }
+    var txt = allEls[i].textContent.trim().toLowerCase();
+    if (txt === 'pendentes' || txt === 'pendente') { recebidos = allEls[i]; break; }
   }
   if (!recebidos) {
     for (var i2 = 0; i2 < allEls.length; i2++) {
-      if (allEls[i2].textContent.includes('Pendentes') &&
-        allEls[i2].tagName !== 'BODY' && allEls[i2].tagName !== 'HTML') { recebidos = allEls[i2]; break; }
+      var txt2 = allEls[i2].textContent.toLowerCase();
+      if (txt2.includes('pendentes') &&
+        allEls[i2].tagName !== 'BODY' && allEls[i2].tagName !== 'HTML' && allEls[i2].tagName !== 'SCRIPT') { 
+        recebidos = allEls[i2]; 
+        break; 
+      }
     }
   }
   if (recebidos) {
