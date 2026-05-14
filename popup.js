@@ -986,6 +986,11 @@ document.getElementById('selectManualTipo').addEventListener('change', async (e)
   currentTipo = tipo;
   currentDespacho = DESPACHOS[tipo];
   currentPolicial = getPolicial(tipo);
+  
+  // Oculta a análise do BO e resumo IA para ficar mais minimalista
+  hide('secAnalysis');
+  hide('secResumoIA');
+  
   document.getElementById('destinatarioName').textContent = currentPolicial || '(nenhum configurado para este tipo)';
   addLog(`Inserindo despacho: ${TIPO_LABELS[tipo]}`, 'info');
   setStatus('Inserindo despacho...', 'active');
