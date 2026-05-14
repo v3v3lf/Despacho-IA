@@ -779,12 +779,7 @@ function getPolicial(tipo) {
   return rule ? rule.policial.toUpperCase() : null;
 }
 
-// STEP 5 - Add recipient (user clicks button)
-document.getElementById('btnAddDestinatario').addEventListener('click', async () => {
-  setStatus('Incluindo destinatário...', 'active');
-  const policial = currentPolicial || getPolicial(currentTipo);
-  await sendToTab('STEP5_INCLUIR_DESTINATARIO', { policial });
-});
+
 
 
 // Next BO
@@ -956,7 +951,7 @@ document.getElementById('btnM4').addEventListener('click', async () => {
   if (!tipo && !currentDespacho) { addLog('Selecione o tipo de despacho', 'warning'); return; }
   const desp = tipo ? DESPACHOS[tipo] : currentDespacho;
   const pol = tipo ? getPolicial(tipo) : currentPolicial;
-  document.getElementById('destinatarioName').textContent = pol || '(nenhum configurado para este tipo)';
+  document.getElementById('destinatarioName').textContent = pol || 'Nenhum policial';
   await sendToTab('STEP4_INSERT_DESPACHO', { despacho: desp, rules });
 });
 
@@ -991,7 +986,7 @@ document.getElementById('selectManualTipo').addEventListener('change', async (e)
   hide('secAnalysis');
   hide('secResumoIA');
   
-  document.getElementById('destinatarioName').textContent = currentPolicial || '(nenhum configurado para este tipo)';
+  document.getElementById('destinatarioName').textContent = currentPolicial || 'Nenhum policial';
   addLog(`Inserindo despacho: ${TIPO_LABELS[tipo]}`, 'info');
   setStatus('Inserindo despacho...', 'active');
   await sendToTab('STEP4_INSERT_DESPACHO', { despacho: currentDespacho, rules });
