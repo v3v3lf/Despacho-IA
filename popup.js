@@ -771,20 +771,6 @@ function getPolicial(tipo) {
   return rule ? rule.policial.toUpperCase() : null;
 }
 
-// STEP 4 - Insert despacho (user clicks button)
-document.getElementById('btnInsertDespacho').addEventListener('click', async () => {
-  if (!currentDespacho) { addLog('Nenhum despacho selecionado', 'error'); return; }
-  setStatus('Inserindo despacho...', 'active');
-
-  // Update destinatário section before sending
-  const policial = currentPolicial || getPolicial(currentTipo);
-  document.getElementById('destinatarioName').textContent = policial || '(nenhum configurado para este tipo)';
-
-  await sendToTab('STEP4_INSERT_DESPACHO', { despacho: currentDespacho, rules });
-});
-
-
-
 // STEP 5 - Add recipient (user clicks button)
 document.getElementById('btnAddDestinatario').addEventListener('click', async () => {
   setStatus('Incluindo destinatário...', 'active');
