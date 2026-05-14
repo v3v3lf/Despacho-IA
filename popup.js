@@ -530,6 +530,14 @@ function showSection(id) {
   sec.classList.add('active-step');
 }
 
+function resetStep5Button() {
+  const btn = document.getElementById('btnAddDestinatario');
+  if (btn) {
+    btn.classList.remove('success', 'primary');
+    btn.classList.add('ghost');
+  }
+}
+
 function onStepDone(step) {
   // ATUALIZAR COR DO BOTAO MANUAL
   const btnM = document.getElementById('btnM' + step);
@@ -557,6 +565,11 @@ function onStepDone(step) {
   }
   if (step === 5) {
     setStatus('Destinatário adicionado ✓', 'success');
+    const btnAdd = document.getElementById('btnAddDestinatario');
+    if (btnAdd) {
+      btnAdd.classList.remove('primary', 'ghost');
+      btnAdd.classList.add('success');
+    }
   }
   if (step === 6) {
     setStatus('Salvo ✓ — clique em Resolver para finalizar', 'success');
@@ -619,6 +632,7 @@ document.getElementById('btnStart').addEventListener('click', async () => {
   document.getElementById('analysisBox').innerHTML = '<div style="color: #64748b; font-size: 13px;">Clique no botão acima para gerar o resumo com IA.</div>';
   hide('despachoSuggestion');
   document.getElementById('selectManualTipo').value = '';
+  resetStep5Button();
 
   // Reset manual buttons
   for (let i = 1; i <= 7; i++) {
@@ -788,6 +802,7 @@ document.getElementById('btnNext').addEventListener('click', async () => {
   document.getElementById('analysisBox').innerHTML = '<div style="color: #64748b; font-size: 13px;">Clique no botão acima para gerar o resumo com IA.</div>';
   hide('despachoSuggestion');
   document.getElementById('selectManualTipo').value = '';
+  resetStep5Button();
 
   // Reset manual buttons
   for (let i = 1; i <= 7; i++) {
@@ -914,6 +929,7 @@ document.getElementById('btnResetManual').addEventListener('click', (e) => {
   document.getElementById('analysisBox').innerHTML = '<div style="color: #64748b; font-size: 13px;">Clique no botão acima para gerar o resumo com IA.</div>';
   hide('despachoSuggestion');
   document.getElementById('selectManualTipo').value = '';
+  resetStep5Button();
   
   // Limpa o estado visual dos botões manuais
   for (let i = 1; i <= 7; i++) {

@@ -194,7 +194,9 @@ function findByText(selector, text) {
   return Array.from(document.querySelectorAll(selector))
     .find(function (el) {
       var content = (el.textContent || '').trim().toLowerCase();
-      return content.includes(t);
+      var val = (el.value || '').trim().toLowerCase();
+      // Verifica texto interno ou atributo value (comum em inputs do SISP)
+      return content.includes(t) || val.includes(t);
     });
 }
 
@@ -1730,26 +1732,39 @@ async function step6_salvar() {
   try {
     log('Salvando despacho...', 'info');
 
-    // Estrategia 1: Botao com texto "Salvar", "Gravar" ou "Encaminhar"
-    var btn = findByText('button,a', 'Salvar') || 
-              findByText('button,a', 'Gravar') || 
-              findByText('button,a', 'Salvar Alterações') || 
-              findByText('button,a', 'encaminhar externamente') ||
-              findByText('button,a', 'encaminhar');
+    // Estrategia 1: Prioridade Máxima para Encaminhar Externamente (pedido do usuário)
+    var btn = findByText('button, a, input[type="button"], input[type="submit"]', 'encaminhar externamente');
 
-    // Estrategia 2: Botao de sucesso (verde/azul) visivel - filtrando seletores de unidade
+    // Estrategia 2: Outros botões de salvamento/encaminhamento
     if (!btn) {
-      btn = Array.from(document.querySelectorAll('button.btn-success, button.btn-primary:not([title*="Incluir"])'))
+      var salvadores = ['Salvar', 'Gravar', 'Salvar Alterações', 'encaminhar'];
+      for (var i = 0; i < salvadores.length; i++) {
+        var found = findByText('button, a, input[type="button"], input[type="submit"]', salvadores[i]);
+        if (found) {
+          // Verifica se não é um seletor de unidade
+          var t = (found.textContent || found.value || '').toLowerCase();
+          if (!t.includes('escolher') && !t.includes('unidade') && !t.includes('destinat')) {
+            btn = found;
+            break;
+          }
+        }
+      }
+    }
+
+    // Estrategia 3: Botao de sucesso (verde/azul) visivel - filtrando seletores de unidade
+    if (!btn) {
+      btn = Array.from(document.querySelectorAll('button.btn-success, button.btn-primary:not([title*="Incluir"]), input.btn-success, input.btn-primary'))
         .find(function(b) {
-          var t = (b.textContent || '').toLowerCase();
+          var t = (b.textContent || b.value || '').toLowerCase();
           var isVisible = b.getBoundingClientRect().width > 0 || b.offsetParent !== null;
-          // Ignorar se o botão for de "Escolher unidade"
-          var isUnitPicker = t.includes('escolher') || t.includes('unidade');
+          // Filtro agressivo para ignorar seletores de unidade/destinatário
+          var isUnitPicker = t.includes('escolher') || t.includes('unidade') || t.includes('destinat') || t.includes('selecionar');
           return isVisible && !isUnitPicker;
         });
     }
 
     if (btn) {
+      log('Botao Salvar identificado: ' + (btn.textContent || btn.value || 'sem texto'), 'info');
       fastClick(btn);
       log('Botao Salvar clicado ✓', 'success');
       notify('STEP_DONE', { step: 6 });
@@ -1757,6 +1772,7 @@ async function step6_salvar() {
       // Aguardar um curto período para evitar repetição acidental de clique
       await sleep(1500);
     } else {
+      log('Botao Salvar nao encontrado em ' + frameType(), 'warning');
       notify('STEP_ERROR', { step: 6, msg: 'Botao Salvar nao encontrado' });
     }
   } finally {
