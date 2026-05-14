@@ -79,30 +79,9 @@
               <button class="btn-manual full" id="btnM2">② Abrir BO</button>
             </div>
 
-            <!-- STEP 3 - Analisar + Fase Análise agrupada -->
+            <!-- STEP 3 - Analisar + 3.1 Resumir com IA -->
             <div class="manual-step-group">
               <button class="btn-manual full" id="btnM3">③ Analisar</button>
-              <!-- Fase Análise do BO (aparece aqui quando ativa) -->
-              <div class="inline-phase hidden" id="secAnalysis">
-                <div class="phase-label">
-                  <span class="step-num small">③</span>
-                  <span class="step-label">Análise do BO</span>
-                </div>
-
-                <!-- SUGESTÃO DE DESPACHO -->
-                <div id="despachoSuggestion" class="suggestion-block hidden">
-                  <div class="suggestion-label">
-                    <span class="tag" id="tipoTag">—</span>
-                    Despacho sugerido:
-                  </div>
-                  <div class="despacho-preview" id="despachoPreview"></div>
-
-                </div>
-              </div>
-            </div>
-
-            <!-- STEP 3.1 - Resumir com IA -->
-            <div class="manual-step-group">
               <button class="btn-manual full" id="btnM3_1" style="background: linear-gradient(135deg, #1e3a5f 0%, #0f2027 100%); border: 1px solid #38bdf8;"><span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;border:1.5px solid currentColor;font-size:10px;font-weight:bold;margin-right:4px;flex-shrink:0;">3.1</span> Resumir com IA</button>
               <div class="inline-phase hidden" id="secResumoIA">
                 <div class="phase-label">
@@ -115,9 +94,26 @@
               </div>
             </div>
 
-            <!-- STEP 4 - Inserir despacho + Botão "Inserir outro despacho" -->
+            <!-- STEP 4 - Inserir despacho + Análise do BO -->
             <div class="manual-step-group">
               <button class="btn-manual full" id="btnM4">④ Inserir despacho</button>
+              
+              <!-- Fase Análise do BO (movida para cá) -->
+              <div class="inline-phase hidden" id="secAnalysis">
+                <div class="phase-label">
+                  <span class="step-num small">④</span>
+                  <span class="step-label">Análise do BO</span>
+                </div>
+                <!-- SUGESTÃO DE DESPACHO -->
+                <div id="despachoSuggestion" class="suggestion-block hidden">
+                  <div class="suggestion-label">
+                    <span class="tag" id="tipoTag">—</span>
+                    Despacho sugerido:
+                  </div>
+                  <div class="despacho-preview" id="despachoPreview"></div>
+                </div>
+              </div>
+
               <!-- Select "Inserir outro despacho" unificado como botão -->
               <div class="inline-phase" id="insertOutroDespachoWrapper">
                 <select id="selectManualTipo" class="select-outro-despacho">
