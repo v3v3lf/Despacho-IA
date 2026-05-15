@@ -27,13 +27,13 @@
   "content_scripts": [
     {
       "matches": [
-        "https://sisp.ciasc.sc.gov.br/*",
-        "https://backend.ssp.sc.gov.br/*"
+        "*://sisp.ciasc.sc.gov.br/*",
+        "*://backend.ssp.sc.gov.br/*"
       ],
       "js": [
         "content.js"
       ],
-      "run_at": "document_idle",
+      "run_at": "document_start",
       "all_frames": true
     }
   ],

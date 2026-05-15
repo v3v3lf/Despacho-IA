@@ -106,7 +106,20 @@ const FATO_OPTIONS = [
   { value: 'rel_invest_sem_autoria', label: 'REL. INVEST. S/ AUTORIA' },
 ];
 
-// ---- STATE ----
+const DEFAULT_GEMINI_MODEL = 'gemini-1.5-flash-002';
+
+const STEP_FRAME_TYPE = {
+  'STEP1_CLICK_BO': 'LIST',
+  'STEP2_OPEN_BO': 'LIST',
+  'STEP3_ANALYZE': 'FORM',
+  'STEP4_INSERT_DESPACHO': 'FORM',
+  'STEP5_INCLUIR_DESTINATARIO': 'FORM',
+  'STEP6_SALVAR': 'FORM',
+  'STEP7_RESOLVER': 'FORM',
+  'DEBUG_FORM': 'FORM',
+  'DEBUG_DOM': 'ANY'
+};
+
 let rules = [];
 let logs = [];
 let currentTipo = null;
@@ -116,8 +129,6 @@ let currentResumoIA = null;
 let currentRelatoText = '';
 let currentFatos = '';
 let isAutoMode = false;
-
-const DEFAULT_GEMINI_MODEL = 'gemini-1.5-flash-002';
 let googleApiKey = '';
 let geminiModel = DEFAULT_GEMINI_MODEL;
 
@@ -335,9 +346,13 @@ ${textoRelato.slice(0, limit)}`;
   throw new Error(`API Google instável ou indisponível (${msg}). Tente novamente ou altere o modelo em ⚙ REGRAS.`);
 }
 
-// ---- INIT ----
 async function initApp() {
-  // 1. Resetar estado do fluxo para garantir início limpo (conforme solicitado pelo usuário)
+  console.log('[Despacho IA] Inicializando App...');
+  
+  // 1. Carrega dados de IA que não dependem de sessão
+  loadAiConfigUI();
+
+  // 2. Resetar estado do fluxo
   currentTipo = null;
   currentDespacho = null;
   currentPolicial = null;
@@ -346,19 +361,23 @@ async function initApp() {
   currentFatos = '';
   isAutoMode = false;
 
-  // 2. Verifica Autenticação primeiro
-  const sessao = await Auth.verificarSessao();
-  
-  // Carrega o email salvo mesmo se não estiver autenticado (para preencher o campo de login)
-  chrome.storage.local.get(['sessao_email'], data => {
-    const emailInput = document.getElementById('loginEmail');
-    if (emailInput && data.sessao_email) {
-      emailInput.value = data.sessao_email;
-    }
-  });
+  // 3. Verifica Autenticação primeiro
+  let sessao = { autenticado: false };
+  try {
+    sessao = await Auth.verificarSessao();
+  } catch (err) {
+    console.error('[Despacho IA] Erro ao verificar sessão:', err);
+  }
 
   if (!sessao.autenticado) {
-    // Se não está logado, esconde tudo e mostra o login
+    console.log('[Despacho IA] Usuário não autenticado.');
+    const emailInput = document.getElementById('loginEmail');
+    chrome.storage.local.get(['sessao_email'], data => {
+      if (emailInput && data.sessao_email) {
+        emailInput.value = data.sessao_email;
+      }
+    });
+
     document.getElementById('loginScreen').classList.remove('hidden');
     document.getElementById('panelFlow').classList.add('hidden');
     document.getElementById('panelConfig').classList.add('hidden');
@@ -370,14 +389,16 @@ async function initApp() {
   // 3. Está logado: exibe interface normal e botão de sair
   document.getElementById('loginScreen').classList.add('hidden');
   document.getElementById('panelFlow').classList.remove('hidden');
+  document.getElementById('panelConfig').classList.remove('hidden'); // ADICIONADO
   document.querySelector('.bottom-nav').style.display = 'flex';
   document.getElementById('btnLogout').style.display = 'block';
 
   // 4. Carrega configurações e regras locais
   chrome.storage.local.get(['rules', 'logs', 'googleApiKey', 'geminiModel'], data => {
-    // Só atribui se houver dados, evitando resetar para vazio por erro de leitura
-    if (data.rules) rules = data.rules;
-    if (data.logs) logs = data.logs;
+    // Garante que rules e logs sejam sempre arrays
+    rules = Array.isArray(data.rules) ? data.rules : [];
+    logs = Array.isArray(data.logs) ? data.logs : [];
+    
     if (data.googleApiKey) googleApiKey = data.googleApiKey;
     if (data.geminiModel) {
       if (data.geminiModel === 'gemini-3-flash' || data.geminiModel === 'gemini-3.1-flash-lite' || data.geminiModel === 'gemini-2.0-flash' || data.geminiModel === 'gemini-1.5-flash') {
@@ -388,10 +409,15 @@ async function initApp() {
       }
     }
 
-    loadAiConfigUI();
-    renderRules();
-    renderLogs();
-    checkTab();
+    try {
+      loadAiConfigUI();
+      renderRules();
+      renderLogs();
+      checkTab();
+    } catch (err) {
+      console.error('[Despacho IA] Erro na inicialização da UI:', err);
+      addLog('Erro ao carregar interface: ' + err.message, 'error');
+    }
   });
 }
 
@@ -442,71 +468,48 @@ async function findTargetTab() {
   return null;
 }
 
-// ---- SEND MESSAGE ----
-// Frame type routing: each step goes to the right frame
-// Steps 1,2 -> LIST frame (tabela de BOs)
-// Steps 3-7  -> FORM frame (formulario do BO)
-// STEP3_ANALYZE -> needs response, polls all frames
-
-const STEP_FRAME_TYPE = {
-  'STEP1_CLICK_BO': 'LIST',
-  'STEP2_OPEN_BO': 'ANY',
-  'STEP3_ANALYZE': 'FORM',
-  'STEP4_INSERT_DESPACHO': 'FORM',
-  'STEP5_INCLUIR_DESTINATARIO': 'FORM',
-  'STEP6_SALVAR': 'FORM',
-  'STEP7_RESOLVER': 'FORM',
-  'DEBUG_DOM': 'ANY',
-  'DEBUG_FORM': 'FORM',
-};
 
 async function sendToTab(type, extra) {
-  extra = extra || {};
   const tab = await findTargetTab();
   if (!tab) {
-    addLog('Acesse o SISP primeiro (tab não encontrada)!', 'error');
+    addLog('Nenhuma aba do SISP detectada!', 'error');
     return null;
   }
 
-  // Sempre injeta o content script para garantir que funcione mesmo em BOs abertos manualmente ou se a página recarregou
+  // SEMPRE injeta o content script para garantir que ele esteja presente (mesmo após recarregar a página)
   try {
     await chrome.scripting.executeScript({
       target: { tabId: tab.id, allFrames: true },
       files: ['content.js']
     });
-    window.scriptsInjected = true;
   } catch (e) {
-    console.warn('[Popup] Injection error (maybe already present or no permission):', e.message);
+    // Silencioso se falhar (pode ser problema de permissão em frames cross-origin, o que é esperado no SISP)
+    console.warn('[Popup] Falha ao injetar script (pode já estar presente):', e.message);
   }
   await sleep(100);
 
-  // STEP3_ANALYZE needs a real response value — poll all frames for one that has a 'tipo'
+  const cmd = Object.assign({ type }, extra);
+
+  // Caso especial: STEP3_ANALYZE precisa pollar frames por resposta
   if (type === 'STEP3_ANALYZE') {
-    console.log('[Popup] Sending STEP3_ANALYZE to tab', tab.id);
-    return await sendToAllFramesForResponse(tab.id, Object.assign({ type }, extra));
+    return await sendToAllFramesForResponse(tab.id, cmd);
   }
 
-  // For all other steps: route to the correct frame type
+  // Roteamento geral via background
   const frameType = STEP_FRAME_TYPE[type] || 'ANY';
-  addLog(`Enviando ${type} para frame tipo=${frameType}`, 'info');
+  addLog(`Enviando ${type} (${frameType})...`, 'info');
 
-  return new Promise(function (res) {
+  return new Promise(resolve => {
     chrome.runtime.sendMessage({
       type: 'SEND_TO_FRAME_TYPE',
+      tabId: tab.id,
       frameType: frameType,
-      cmd: Object.assign({ type }, extra)
-    }, function (resp) {
+      cmd: cmd
+    }, response => {
       if (chrome.runtime.lastError) {
-        console.error('[Popup] Send error:', chrome.runtime.lastError);
-        addLog('Erro envio: ' + chrome.runtime.lastError.message, 'error');
-        res(null);
-      } else {
-        console.log('[Popup] Response from BG:', resp);
-        if (resp && resp.fallback) {
-          addLog(`Frame ${frameType} não identificado, usando fallback`, 'warning');
-        }
-        res(resp);
+        console.warn('[Popup] Erro ao enviar para background:', chrome.runtime.lastError.message);
       }
+      resolve(response);
     });
   });
 }
@@ -566,11 +569,7 @@ function showSection(id) {
 }
 
 function resetStep5Button() {
-  const btn = document.getElementById('btnAddDestinatario');
-  if (btn) {
-    btn.classList.remove('success', 'primary');
-    btn.classList.add('ghost');
-  }
+  // btnAddDestinatario não existe no HTML v2, mas mantemos o reset de estado visual se necessário em outros botões
 }
 
 function onStepDone(step) {
@@ -600,11 +599,6 @@ function onStepDone(step) {
   }
   if (step === 5) {
     setStatus('Destinatário adicionado ✓', 'success');
-    const btnAdd = document.getElementById('btnAddDestinatario');
-    if (btnAdd) {
-      btnAdd.classList.remove('primary', 'ghost');
-      btnAdd.classList.add('success');
-    }
   }
   if (step === 6) {
     setStatus('Salvo ✓ — clique em Resolver para finalizar', 'success');
@@ -654,6 +648,7 @@ if (document.getElementById('btnDebugForm')) {
 
 // STEP 1 - Start
 document.getElementById('btnStart').addEventListener('click', async () => {
+  console.log('[Popup] Botão Iniciar clicado');
   isAutoMode = true;
   window.scriptsInjected = false; // Reset to force re-verification
   const tab = await findTargetTab();
@@ -886,12 +881,16 @@ function saveRules() {
 
 function renderRules() {
   const c = document.getElementById('rulesContainer');
-  if (rules.length === 0) {
+  if (!c) return;
+
+  if (!Array.isArray(rules) || rules.length === 0) {
     c.innerHTML = '<p style="color:var(--muted);font-size:10px;text-align:center;padding:8px 0;">Nenhuma regra configurada.</p>';
     return;
   }
+  
   c.innerHTML = '';
   rules.forEach((rule, i) => {
+    if (!rule) return;
     const div = document.createElement('div');
     div.className = 'rule-item';
     div.innerHTML = `
@@ -902,13 +901,36 @@ function renderRules() {
         ${FATO_OPTIONS.map(o => `<option value="${o.value}" ${rule.fato === o.value ? 'selected' : ''}>${o.label}</option>`).join('')}
       </select>
       <label>Nome do Policial</label>
-      <input type="text" class="rp" data-i="${i}" placeholder="Nome completo do policial conforme SISP" value="${rule.policial || ''}">
+      <input type="text" class="rp" data-i="${i}" placeholder="Nome completo do policial conforme SISP" value="${escapeHtml(rule.policial || '')}">
     `;
     c.appendChild(div);
   });
-  c.querySelectorAll('.rf').forEach(s => s.addEventListener('change', e => { rules[+e.target.dataset.i].fato = e.target.value; saveRules(); }));
-  c.querySelectorAll('.rp').forEach(s => s.addEventListener('input', e => { rules[+e.target.dataset.i].policial = e.target.value.toUpperCase(); e.target.value = e.target.value.toUpperCase(); saveRules(); }));
-  c.querySelectorAll('.rule-remove').forEach(b => b.addEventListener('click', e => { rules.splice(+e.currentTarget.dataset.i, 1); saveRules(); renderRules(); }));
+  
+  // Reatribui listeners
+  c.querySelectorAll('.rf').forEach(s => s.addEventListener('change', e => { 
+    const idx = +e.target.dataset.i;
+    if (rules[idx]) {
+      rules[idx].fato = e.target.value; 
+      saveRules(); 
+    }
+  }));
+  
+  c.querySelectorAll('.rp').forEach(s => s.addEventListener('input', e => { 
+    const idx = +e.target.dataset.i;
+    if (rules[idx]) {
+      const val = e.target.value.toUpperCase();
+      rules[idx].policial = val; 
+      e.target.value = val; 
+      saveRules(); 
+    }
+  }));
+  
+  c.querySelectorAll('.rule-remove').forEach(b => b.addEventListener('click', e => { 
+    const idx = +e.currentTarget.dataset.i;
+    rules.splice(idx, 1); 
+    saveRules(); 
+    renderRules(); 
+  }));
 }
 
 document.getElementById('btnAddRule').addEventListener('click', () => {
@@ -973,12 +995,13 @@ document.getElementById('btnResetManual').addEventListener('click', (e) => {
   addLog('Ciclo manual resetado', 'info');
 });
 
-document.getElementById('btnM1').addEventListener('click', async () => { isAutoMode = false; await sendToTab('STEP1_CLICK_BO'); });
-document.getElementById('btnM2').addEventListener('click', async () => { isAutoMode = false; await triggerStep2(); });
-document.getElementById('btnM3').addEventListener('click', async () => { isAutoMode = false; await triggerStep3(); });
-document.getElementById('btnM3_1').addEventListener('click', async () => { isAutoMode = false; await triggerStep3_1(); });
+document.getElementById('btnM1').addEventListener('click', async () => { console.log('[Popup] Botão M1 clicado'); isAutoMode = false; await sendToTab('STEP1_CLICK_BO'); });
+document.getElementById('btnM2').addEventListener('click', async () => { console.log('[Popup] Botão M2 clicado'); isAutoMode = false; await triggerStep2(); });
+document.getElementById('btnM3').addEventListener('click', async () => { console.log('[Popup] Botão M3 clicado'); isAutoMode = false; await triggerStep3(); });
+document.getElementById('btnM3_1').addEventListener('click', async () => { console.log('[Popup] Botão M3.1 clicado'); isAutoMode = false; await triggerStep3_1(); });
 
 document.getElementById('btnM4').addEventListener('click', async () => {
+  console.log('[Popup] Botão M4 clicado');
   isAutoMode = false;
   const tipo = document.getElementById('selectManualTipo').value;
   if (!tipo && !currentDespacho) { addLog('Selecione o tipo de despacho', 'warning'); return; }
@@ -989,6 +1012,7 @@ document.getElementById('btnM4').addEventListener('click', async () => {
 });
 
 document.getElementById('btnM5').addEventListener('click', async () => {
+  console.log('[Popup] Botão M5 clicado');
   isAutoMode = false;
   const tipo = document.getElementById('selectManualTipo').value;
   const pol = tipo ? getPolicial(tipo) : (currentPolicial || getPolicial(currentTipo));
@@ -996,11 +1020,13 @@ document.getElementById('btnM5').addEventListener('click', async () => {
 });
 
 document.getElementById('btnM6').addEventListener('click', async () => { 
+  console.log('[Popup] Botão M6 clicado');
   isAutoMode = false; 
   setStatus('Salvando...', 'active');
   await sendToTab('STEP6_SALVAR'); 
 });
 document.getElementById('btnM7').addEventListener('click', async () => { 
+  console.log('[Popup] Botão M7 clicado');
   isAutoMode = false; 
   setStatus('Encerrando BO...', 'active');
   await sendToTab('STEP7_RESOLVER'); 

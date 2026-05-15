@@ -69,13 +69,14 @@ chrome.windows.onRemoved.addListener(function (windowId) {
 
 // Robust helper to find the SISP tab
 function findSispTab(callback) {
-  chrome.tabs.query({ url: '*://sisp.ciasc.sc.gov.br/*' }, function (tabs) {
+  // Busca por URLs conhecidas do SISP (usando *:// para ser mais resiliente)
+  chrome.tabs.query({ url: ['*://sisp.ciasc.sc.gov.br/*', '*://backend.ssp.sc.gov.br/*'] }, function (tabs) {
     if (tabs && tabs.length > 0) {
-      // Prioritize active or last focused
+      // Prioriza a aba ativa no momento ou a primeira encontrada
       var best = tabs.find(t => t.active) || tabs[0];
       callback(best);
     } else {
-      // Ultimate fallback: any active non-panel tab
+      // Último recurso: qualquer aba ativa (exceto a do painel da extensão)
       chrome.tabs.query({ active: true }, function (all) {
         var filtered = all.filter(t => t.windowId !== panelWindowId);
         callback(filtered.length > 0 ? filtered[0] : (all.length > 0 ? all[0] : null));
@@ -97,18 +98,28 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
   // Optimized routing: send to all frames immediately
   if (message.type === 'SEND_TO_FRAME_TYPE') {
     var cmd = message.cmd;
+    var frameType = message.frameType || 'ANY';
+    
     findSispTab(function (tab) {
-      if (!tab) { sendResponse({ ok: false, err: 'no tab' }); return; }
+      if (!tab) { 
+        console.warn('[Background] Nenhuma aba do SISP encontrada para:', cmd.type);
+        sendResponse({ ok: false, err: 'no tab' }); 
+        return; 
+      }
+      
       var tabId = tab.id;
+      console.log(`[Background] Roteando ${cmd.type} para frame ${frameType} na aba ${tabId}`);
 
       chrome.webNavigation.getAllFrames({ tabId: tabId }, function (frames) {
         if (!frames || frames.length === 0) {
+          console.warn('[Background] Nenhum frame detectado na aba', tabId);
           // Tab-level broadcast if no frames detected
           chrome.tabs.sendMessage(tabId, cmd, function (r) { chrome.runtime.lastError; });
           sendResponse({ ok: true, broadcast: true });
           return;
         }
 
+        console.log(`[Background] Enviando para ${frames.length} frames...`);
         frames.forEach(function (frame) {
           chrome.tabs.sendMessage(tabId, cmd, { frameId: frame.frameId }, function (r) {
             chrome.runtime.lastError;
@@ -138,6 +149,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     });
     return true;
   }
+
 
   // PING from popup
   if (message.type === 'PING_TAB') {
