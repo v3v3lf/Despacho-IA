@@ -933,8 +933,6 @@ document.getElementById('btnResetManual').addEventListener('click', (e) => {
   }
   const btn31 = document.getElementById('btnM3_1');
   if (btn31) btn31.classList.remove('success');
-  currentRelatoText = '';
-  currentFatos = '';
   
   setStatus('Pronto', '');
   addLog('Ciclo manual resetado', 'info');
