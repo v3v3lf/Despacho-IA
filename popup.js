@@ -117,7 +117,7 @@ let currentRelatoText = '';
 let currentFatos = '';
 let isAutoMode = false;
 
-const DEFAULT_GEMINI_MODEL = 'gemini-3-flash';
+const DEFAULT_GEMINI_MODEL = 'gemini-1.5-flash-002';
 let googleApiKey = '';
 let geminiModel = DEFAULT_GEMINI_MODEL;
 
@@ -190,7 +190,7 @@ async function callGeminiGenerate(model, apiKey, prompt) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.1, maxOutputTokens: 600 }
+      generationConfig: { temperature: 0.1, maxOutputTokens: 1000 }
     })
   });
 
@@ -207,23 +207,17 @@ async function callGeminiGenerate(model, apiKey, prompt) {
     ? data.candidates[0].content.parts.map(p => p.text || '').join('\n').trim()
     : '';
 
-  // Filtra "raciocínios mentais" da IA e pega apenas a linha que contém "RESUMO:"
-  if (text.includes('RESUMO:')) {
-    const linhas = text.split('\n');
-    for (let i = linhas.length - 1; i >= 0; i--) {
-      if (linhas[i].includes('RESUMO:')) {
-        text = linhas[i].replace(/^[\s*\-\\]+/, '').replace('RESUMO:', '').trim();
-        break;
-      }
-    }
-  } else {
-    // Fallback: se a IA não gerou a palavra RESUMO, pegamos apenas a última linha válida 
-    // para evitar imprimir os rascunhos (drafts) na tela.
-    const linhas = text.split('\n').filter(l => l.trim().length > 0);
-    if (linhas.length > 0) {
-      text = linhas[linhas.length - 1].replace(/^[\s*\-\\]+/, '').trim();
-    }
+  // 1. Remove blocos de raciocínio da IA (ex: <think>...</think>)
+  text = text.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+
+  // 2. Tenta extrair o conteúdo após a tag "RESUMO:" (independente de maiúsculas/minúsculas)
+  const resumoMatch = text.match(/RESUMO:?\s*([\s\S]+)/i);
+  if (resumoMatch) {
+    text = resumoMatch[1].trim();
   }
+
+  // 3. Remove prefixos redundantes que a IA costuma adicionar mesmo quando não pedimos
+  text = text.replace(/^(Resumo do Relato Individual|Resumo do BO|Resumo):?\s*/i, '').trim();
 
   if (!text) throw new Error('A API não retornou texto para a análise.');
   return text;
@@ -278,8 +272,10 @@ ${textoRelato.slice(0, limit)}`;
   }
 
   let lastError = null;
+  let triedModels = new Set();
   for (let m = 0; m < modelsToTry.length; m++) {
     const model = modelsToTry[m];
+    triedModels.add(model);
 
     // Primeira rodada com contexto maior; se a API retornar erro interno, tenta com contexto menor.
     for (const limit of [12000, 6000]) {
@@ -299,6 +295,38 @@ ${textoRelato.slice(0, limit)}`;
           addLog(`API Gemini instável (${e.message}). Tentativa ${attempt}/3...`, 'warning');
           await sleep(700 * attempt);
         }
+      }
+      if (lastError && !lastError.retryable && lastError.status !== 404) break;
+    }
+
+    // Auto-discover if 404 and we've exhausted our options
+    if (lastError && lastError.status === 404 && m === modelsToTry.length - 1) {
+      try {
+        addLog('Modelo não encontrado. Buscando modelos disponíveis...', 'info');
+        const mResp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(googleApiKey)}`);
+        const mData = await mResp.json();
+        if (mData && mData.models) {
+          const valid = mData.models
+            .filter(x => x.supportedGenerationMethods && x.supportedGenerationMethods.includes('generateContent'))
+            .map(x => x.name.replace('models/', ''));
+          
+          if (valid.length > 0) {
+            const bestModel = valid.find(x => x.includes('flash') && !x.includes('lite')) || 
+                              valid.find(x => x.includes('gemini')) || 
+                              valid[0];
+            
+            if (bestModel && !triedModels.has(bestModel)) {
+              addLog(`Encontrado: ${bestModel}. Tentando novamente...`, 'info');
+              modelsToTry.push(bestModel);
+              chrome.storage.local.set({ geminiModel: bestModel });
+              geminiModel = bestModel;
+            } else {
+              lastError = new Error(`Modelos disponíveis: ${valid.join(', ')}`);
+            }
+          }
+        }
+      } catch (err) {
+        if (err.message.includes('Modelos disponíveis')) lastError = err;
       }
     }
   }
@@ -351,7 +379,14 @@ async function initApp() {
     if (data.rules) rules = data.rules;
     if (data.logs) logs = data.logs;
     if (data.googleApiKey) googleApiKey = data.googleApiKey;
-    if (data.geminiModel) geminiModel = data.geminiModel;
+    if (data.geminiModel) {
+      if (data.geminiModel === 'gemini-3-flash' || data.geminiModel === 'gemini-3.1-flash-lite' || data.geminiModel === 'gemini-2.0-flash' || data.geminiModel === 'gemini-1.5-flash') {
+        geminiModel = 'gemini-1.5-flash-002';
+        chrome.storage.local.set({ geminiModel: 'gemini-1.5-flash-002' });
+      } else {
+        geminiModel = data.geminiModel;
+      }
+    }
 
     loadAiConfigUI();
     renderRules();
