@@ -8,8 +8,13 @@ chrome.storage.local.get(['activePanelId'], function (res) {
   if (res.activePanelId) panelWindowId = res.activePanelId;
 });
 
-chrome.runtime.onInstalled.addListener(function () {
-  chrome.storage.local.set({ rules: [], logs: [], lastEvent: null });
+chrome.runtime.onInstalled.addListener(function (details) {
+  chrome.storage.local.get(['rules', 'logs'], function (data) {
+    var updates = { lastEvent: null };
+    if (!data.rules || details.reason === 'install') updates.rules = data.rules || [];
+    if (!data.logs || details.reason === 'install') updates.logs = data.logs || [];
+    chrome.storage.local.set(updates);
+  });
 });
 
 function setPanelId(id) {
