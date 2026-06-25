@@ -183,10 +183,43 @@ function renderAnalysisBox(fatos, resumo, state, message) {
 
   const stateClass = state ? ' ' + state : '';
   const resumoHtml = resumo
-    ? `<div class="analysis-resumo"><strong>Resumo do Relato Individual</strong>${escapeHtml(resumo)}</div>`
-    : `<div class="analysis-resumo${stateClass}"><strong>Resumo do Relato Individual</strong>${escapeHtml(message || 'Aguardando geração da análise...')}</div>`;
+    ? `<div class="analysis-resumo" style="margin-top: 2px; padding-top: 2px; border-top: none; font-size: 11px; line-height: 1.6; color: var(--text); font-family: 'IBM Plex Mono', monospace; white-space: pre-wrap;">${escapeHtml(resumo)}</div>`
+    : `<div class="analysis-resumo${stateClass}" style="margin-top: 2px; padding-top: 2px; border-top: none; font-size: 11px; line-height: 1.6; font-family: 'IBM Plex Mono', monospace; white-space: pre-wrap;">${escapeHtml(message || 'Aguardando geração da análise...')}</div>`;
 
   document.getElementById('analysisBox').innerHTML = resumoHtml;
+
+  const copyBtn = document.getElementById('btnCopyResumo');
+  if (copyBtn) {
+    if (resumo) {
+      // Exibe o botão ao lado do 3.1
+      copyBtn.style.display = 'inline-flex';
+      
+      // Remove event listeners antigos clonando o botão para evitar duplicações
+      const newCopyBtn = copyBtn.cloneNode(true);
+      copyBtn.parentNode.replaceChild(newCopyBtn, copyBtn);
+      
+      newCopyBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(resumo)
+          .then(() => {
+            const originalText = newCopyBtn.innerHTML;
+            newCopyBtn.innerHTML = '✓ Copiado!';
+            newCopyBtn.style.borderColor = '#22c55e';
+            newCopyBtn.style.color = '#22c55e';
+            setTimeout(() => {
+              newCopyBtn.innerHTML = originalText;
+              newCopyBtn.style.borderColor = '#38bdf8';
+              newCopyBtn.style.color = '#38bdf8';
+            }, 2000);
+          })
+          .catch(err => {
+            console.error('[Despacho IA] Erro ao copiar texto:', err);
+          });
+      });
+    } else {
+      // Esconde o botão se não houver resumo
+      copyBtn.style.display = 'none';
+    }
+  }
 }
 
 function isRetryableGeminiError(status, message) {
@@ -194,18 +227,35 @@ function isRetryableGeminiError(status, message) {
     /internal|temporarily|unavailable|overloaded|timeout|rate/i.test(message || '');
 }
 
-async function callGeminiGenerate(model, apiKey, prompt) {
+async function callGeminiGenerate(model, apiKey, prompt, systemInstruction = '') {
   const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+  
+  const bodyPayload = {
+    contents: [{ role: 'user', parts: [{ text: prompt }] }],
+    generationConfig: { temperature: 0.1, maxOutputTokens: 1000 },
+    safetySettings: [
+      { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
+      { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },
+      { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
+      { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' }
+    ]
+  };
+
+  if (systemInstruction) {
+    bodyPayload.systemInstruction = {
+      parts: [{ text: systemInstruction }]
+    };
+  }
+
   const response = await fetch(endpoint, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents: [{ role: 'user', parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.1, maxOutputTokens: 1000 }
-    })
+    body: JSON.stringify(bodyPayload)
   });
 
   const data = await response.json().catch(() => ({}));
+  console.log('[Despacho IA] Dados brutos da resposta do Gemini:', JSON.stringify(data));
+  
   if (!response.ok) {
     const message = data && data.error && data.error.message ? data.error.message : `HTTP ${response.status}`;
     const err = new Error(message);
@@ -214,8 +264,13 @@ async function callGeminiGenerate(model, apiKey, prompt) {
     throw err;
   }
 
-  let text = (((data.candidates || [])[0] || {}).content || {}).parts
-    ? data.candidates[0].content.parts.map(p => p.text || '').join('\n').trim()
+  const candidate = (data.candidates || [])[0] || {};
+  if (candidate.finishReason && candidate.finishReason !== 'STOP') {
+    console.warn('[Despacho IA] Aviso: finishReason não é STOP:', candidate.finishReason);
+  }
+
+  let text = (candidate.content || {}).parts
+    ? candidate.content.parts.map(p => p.text || '').join('\n').trim()
     : '';
 
   // 1. Remove blocos de raciocínio da IA (ex: <think>...</think>)
@@ -248,38 +303,30 @@ async function gerarResumoRelatoIA(textoBo, fatos) {
     return { ok: false, skipped: true, message: 'Nenhum texto encontrado na página do BO para análise IA.' };
   }
 
-  // ---- EXTRAÇÃO DO RELATO INDIVIDUAL NO JAVASCRIPT ----
-  // Procura a expressão "Relato Individual:" no texto recebido e recorta SOMENTE o trecho após ela.
-  const lowerTexto = textoRelato.toLowerCase();
-  const idxRelato = lowerTexto.indexOf('relato individual');
-  if (idxRelato !== -1) {
-    let recorte = textoRelato.substring(idxRelato);
-    // Remove o rótulo "Relato Individual:" do início
-    const colonPos = recorte.indexOf(':');
-    if (colonPos !== -1 && colonPos < 30) {
-      recorte = recorte.substring(colonPos + 1).trim();
-    } else {
-      recorte = recorte.substring(17).trim();
-    }
-    // Corta na próxima seção (Outras Informações, Condições físicas, ATENDENTES, PROVIDÊNCIAS, etc.)
-    const fimMatch = recorte.match(/\n\s*(?:Outras\s+Informa[cç][oõ]es|Condi[cç][oõ]es\s+f[ií]sicas|ATENDENTES|PROVID[EÊ]NCIAS|PROCEDIMENTOS|REGISTROS\s+RELACIONADOS|ENCAMINHAMENTOS|ASSINATURAS)/i);
-    if (fimMatch) {
-      recorte = recorte.substring(0, fimMatch.index).trim();
-    }
-    if (recorte.length > 10) {
-      textoRelato = recorte;
-      console.log('[Despacho IA] Relato Individual extraído com sucesso (' + textoRelato.length + ' chars)');
-    }
-  }
+  // Mantemos o texto completo do BO para que a IA consiga extrair o número do BO, endereço, envolvidos, etc.
+  addLog('Enviando ' + textoRelato.length + ' caracteres do BO para a API Gemini (Início: "' + textoRelato.substring(0, 50).replace(/\n/g, ' ') + '...")', 'info');
+  console.log('[Despacho IA] Texto completo do BO enviado para a API (' + textoRelato.length + ' chars)');
 
   const configuredModel = geminiModel.replace(/^models\//, '') || DEFAULT_GEMINI_MODEL;
   const modelsToTry = [configuredModel];
   if (configuredModel !== DEFAULT_GEMINI_MODEL) modelsToTry.push(DEFAULT_GEMINI_MODEL);
 
-  function buildPrompt(limit) {
-    return `Resuma o texto abaixo de forma fiel e detalhada em um único parágrafo contínuo. Sua resposta deve começar com RESUMO: seguido do parágrafo.
+  const systemInstruction = `Você é um analista de dados policiais especialista em extrair dados estruturados de Boletins de Ocorrência.
+Sua tarefa é ler todo o texto do Boletim de Ocorrência fornecido e criar um resumo fluido, contínuo e em parágrafo único.
 
-${textoRelato.slice(0, limit)}`;
+Instruções específicas:
+1. Inicie obrigatoriamente com o padrão: "o BO-[NÚMERO DO BO]" (ex: "o BO-00614.2026.0030318"). Utilize o número do BO no formato de registro (ex: "00127.2026.0001088").
+2. No mesmo parágrafo, de forma corrida (sem quebras de linha ou divisões), informe: os fatos comunicados, a data/horário, o endereço do ocorrido, o comunicante, a(s) vítima(s) e o autor do crime (caso identificado).
+3. Inclua a dinâmica do fato de forma detalhada, especificando todas as ações relatadas e todos os objetos/bens subtraídos (como botijões de gás, ferramentas, celular, etc.).
+4. Nunca invente ou assuma informações não descritas explicitamente no texto fornecido.
+5. Se autor ou testemunhas não forem citados ou forem declarados como desconhecidos, simplesmente não os mencione no texto.
+6. ATENÇÃO: O resumo deve ser concluído com um ponto final e conter todo o relato estruturado, sem ser cortado ou truncado no meio de uma frase.`;
+
+  function buildPrompt(limit) {
+    return `Texto extraído do Boletim de Ocorrência:
+---
+${textoRelato.slice(0, limit)}
+---`;
   }
 
   let lastError = null;
@@ -294,7 +341,7 @@ ${textoRelato.slice(0, limit)}`;
 
       for (let attempt = 1; attempt <= 3; attempt++) {
         try {
-          const resumo = await callGeminiGenerate(model, googleApiKey, prompt);
+          const resumo = await callGeminiGenerate(model, googleApiKey, prompt, systemInstruction);
           if (attempt > 1 || limit < 12000 || model !== configuredModel) {
             addLog(`Análise IA gerada após nova tentativa (modelo ${model})`, 'success');
           }
@@ -714,44 +761,46 @@ async function triggerStep3() {
   // ---- PRÉ-EXTRAÇÃO DO RELATO INDIVIDUAL (para agilizar o step 3.1) ----
   currentRelatoText = res.relato || '';
 
-  // Tenta pegar o texto do Relato Individual que o content script cacheou no storage
-  try {
-    const stored = await new Promise(r => chrome.storage.local.get(['_sispRelatoText', '_sispRelatoTimestamp'], r));
-    if (stored._sispRelatoText && /relato\s+individual/i.test(stored._sispRelatoText)) {
-      const age = Date.now() - (stored._sispRelatoTimestamp || 0);
-      if (age < 60000) {
-        currentRelatoText = stored._sispRelatoText;
-        addLog('Relato Individual encontrado via cache do storage!', 'success');
-      }
-    }
-  } catch(e) {}
-
-  // Se ainda não tem "Relato Individual", tenta via scripting API
-  if (!/relato\s+individual/i.test(currentRelatoText)) {
-    addLog('Relato não encontrado no frame principal. Buscando em todos os frames...', 'warning');
+  // Só busca no storage ou via scripting API se o texto principal estiver vazio ou não contiver "relato individual"
+  if (!currentRelatoText || !/relato\s+individual/i.test(currentRelatoText)) {
+    // Tenta pegar o texto do Relato Individual que o content script cacheou no storage
     try {
-      const tabs = await new Promise(r => chrome.tabs.query({ active: true, currentWindow: true }, r));
-      // Filtra para garantir que não estamos tentando injetar no próprio popup ou em páginas protegidas
-      const tab = tabs.find(t => t.url && t.url.includes('sisp.ciasc.sc.gov.br'));
-      
-      if (tab) {
-        const injectionResults = await chrome.scripting.executeScript({
-          target: { tabId: tab.id, allFrames: true },
-          func: () => document.body ? (document.body.innerText || document.body.textContent || '') : ''
-        });
-        if (injectionResults && injectionResults.length > 0) {
-          for (const frame of injectionResults) {
-            const frameText = (frame.result || '');
-            if (/relato\s+individual/i.test(frameText)) {
-              currentRelatoText = frameText;
-              addLog('Relato Individual encontrado via scripting API!', 'success');
-              break;
+      const stored = await new Promise(r => chrome.storage.local.get(['_sispRelatoText', '_sispRelatoTimestamp'], r));
+      if (stored._sispRelatoText && /relato\s+individual/i.test(stored._sispRelatoText)) {
+        const age = Date.now() - (stored._sispRelatoTimestamp || 0);
+        if (age < 60000) {
+          currentRelatoText = stored._sispRelatoText;
+          addLog('Relato Individual encontrado via cache do storage!', 'success');
+        }
+      }
+    } catch(e) {}
+
+    // Se ainda não tem "Relato Individual", tenta via scripting API
+    if (!/relato\s+individual/i.test(currentRelatoText)) {
+      addLog('Relato não encontrado no frame principal. Buscando em todos os frames...', 'warning');
+      try {
+        const tabs = await new Promise(r => chrome.tabs.query({ active: true, currentWindow: true }, r));
+        const tab = tabs && tabs[0];
+        
+        if (tab) {
+          const injectionResults = await chrome.scripting.executeScript({
+            target: { tabId: tab.id, allFrames: true },
+            func: () => document.body ? (document.body.innerText || document.body.textContent || '') : ''
+          });
+          if (injectionResults && injectionResults.length > 0) {
+            for (const frame of injectionResults) {
+              const frameText = (frame.result || '');
+              if (/relato\s+individual/i.test(frameText)) {
+                currentRelatoText = frameText;
+                addLog('Relato Individual encontrado via scripting API!', 'success');
+                break;
+              }
             }
           }
         }
+      } catch(e) {
+        console.error('[Despacho IA] scripting API error:', e);
       }
-    } catch(e) {
-      console.error('[Despacho IA] scripting API error:', e);
     }
   }
 
@@ -774,10 +823,36 @@ async function triggerStep3_1() {
   showSection('secResumoIA');
   renderAnalysisBox(currentFatos, null, '', '⟳ Gerando resumo com IA...');
   setStatus('Gerando resumo com IA...', 'active');
+  addLog('Extraindo textos de todas as seções do BO...', 'info');
+
+  let textoCompletoBo = '';
+  try {
+    const tabs = await new Promise(r => chrome.tabs.query({ active: true, currentWindow: true }, r));
+    const tab = tabs && tabs[0];
+    if (tab) {
+      const injectionResults = await chrome.scripting.executeScript({
+        target: { tabId: tab.id, allFrames: true },
+        func: () => document.body ? (document.body.innerText || document.body.textContent || '') : ''
+      });
+      if (injectionResults && injectionResults.length > 0) {
+        textoCompletoBo = injectionResults
+          .map(frame => (frame.result || '').trim())
+          .filter(text => text.length > 20)
+          .join('\n\n---\n\n');
+      }
+    }
+  } catch (e) {
+    console.error('[Despacho IA] Erro ao extrair texto de frames:', e);
+  }
+
+  if (!textoCompletoBo) {
+    textoCompletoBo = currentRelatoText;
+  }
+
   addLog('Chamando API Gemini...', 'info');
 
   try {
-    const resumoRes = await gerarResumoRelatoIA(currentRelatoText, currentFatos);
+    const resumoRes = await gerarResumoRelatoIA(textoCompletoBo, currentFatos);
     if (resumoRes.ok) {
       currentResumoIA = resumoRes.resumo;
       renderAnalysisBox(currentFatos, currentResumoIA);

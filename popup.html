@@ -82,11 +82,14 @@
             <!-- STEP 3 - Analisar + 3.1 Resumir com IA -->
             <div class="manual-step-group">
               <button class="btn-manual full" id="btnM3">③ Analisar</button>
-              <button class="btn-manual full" id="btnM3_1" style="background: linear-gradient(135deg, #1e3a5f 0%, #0f2027 100%); border: 1px solid #38bdf8;"><span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;border:1.5px solid currentColor;font-size:10px;font-weight:bold;margin-right:4px;flex-shrink:0;">3.1</span> Resumir com IA</button>
+              <button class="btn-manual full" id="btnM3_1" style="background: linear-gradient(135deg, #1e3a5f 0%, #0f2027 100%); border: 1px solid #38bdf8;"><span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;border:1.5px solid currentColor;font-size:10px;font-weight:bold;margin-right:4px;flex-shrink:0;">3.1</span> Resumir com IA o BO</button>
               <div class="inline-phase hidden" id="secResumoIA">
-                <div class="phase-label">
+                <div class="phase-label" style="display: flex; align-items: center; gap: 8px;">
                   <span class="step-num small" style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;border:1.5px solid currentColor;font-size:10px;font-weight:bold;">3.1</span>
-                  <span class="step-label">Resumo do Relato Individual</span>
+                  <button class="btn-manual" id="btnCopyResumo" style="display: none; align-items: center; gap: 4px; padding: 2px 6px; font-size: 9px; height: 18px; line-height: 1; background: transparent; border: 1px solid #38bdf8; color: #38bdf8; border-radius: 3px; font-weight: bold; cursor: pointer; transition: all 0.2s;">
+                    <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    Copiar
+                  </button>
                 </div>
                 <div class="analysis-box" id="analysisBox">
                   <div style="color: #64748b; font-size: 13px;">Clique no botão acima para gerar o resumo com IA.</div>
