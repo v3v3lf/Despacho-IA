@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "SISP • Despacho IA",
-  "version": "2.0",
+  "version": "2.1",
   "description": "Automação inteligente para despacho de Boletins de Ocorrência no sistema SISP",
   "short_name": "SISP IA",
   "permissions": [
@@ -12,10 +12,10 @@
     "webNavigation"
   ],
   "host_permissions": [
-    "https://sisp.ciasc.sc.gov.br/*",
-    "https://backend.ssp.sc.gov.br/*",
+    "*://*.ciasc.sc.gov.br/*",
+    "*://*.ssp.sc.gov.br/*",
     "https://stsdwmaerbyfmgfcfgdv.supabase.co/*",
-    "*://*/*"
+    "https://generativelanguage.googleapis.com/*"
   ],
   "action": {
     "default_icon": {
@@ -27,8 +27,8 @@
   "content_scripts": [
     {
       "matches": [
-        "*://sisp.ciasc.sc.gov.br/*",
-        "*://backend.ssp.sc.gov.br/*"
+        "*://*.ciasc.sc.gov.br/*",
+        "*://*.ssp.sc.gov.br/*"
       ],
       "js": [
         "content.js"

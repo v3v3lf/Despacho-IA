@@ -505,13 +505,27 @@ async function checkTab() {
 
 // Find the SISP tab regardless of window
 async function findTargetTab() {
-  // Try active tab in ANY window first
-  const tabs = await chrome.tabs.query({ url: ['https://sisp.ciasc.sc.gov.br/*', 'https://backend.ssp.sc.gov.br/*'] });
-  if (tabs && tabs.length > 0) {
-    // Return the one that is active if possible, or just the first one
-    const active = tabs.find(t => t.active);
-    return active || tabs[0];
+  // Try matching any SISP/CIASC/SSP subdomains first
+  try {
+    const tabs = await chrome.tabs.query({ url: ['*://*.ciasc.sc.gov.br/*', '*://*.ssp.sc.gov.br/*'] });
+    if (tabs && tabs.length > 0) {
+      const active = tabs.find(t => t.active);
+      return active || tabs[0];
+    }
+  } catch (e) {
+    console.warn('[Popup] Erro na busca de abas do SISP:', e);
   }
+
+  // Fallback: check all active tabs across normal browser windows
+  try {
+    const activeTabs = await chrome.tabs.query({ active: true });
+    if (activeTabs && activeTabs.length > 0) {
+      const currentWin = await chrome.windows.getCurrent();
+      const nonPopup = activeTabs.find(t => t.windowId !== currentWin.id && t.url && (t.url.includes('ciasc.sc.gov.br') || t.url.includes('ssp.sc.gov.br')));
+      if (nonPopup) return nonPopup;
+    }
+  } catch (e) {}
+
   return null;
 }
 

@@ -74,8 +74,8 @@ chrome.windows.onRemoved.addListener(function (windowId) {
 
 // Robust helper to find the SISP tab
 function findSispTab(callback) {
-  // Busca por URLs conhecidas do SISP (usando *:// para ser mais resiliente)
-  chrome.tabs.query({ url: ['*://sisp.ciasc.sc.gov.br/*', '*://backend.ssp.sc.gov.br/*'] }, function (tabs) {
+  // Busca por URLs conhecidas do SISP (usando *://*.ciasc.sc.gov.br/* e *://*.ssp.sc.gov.br/*)
+  chrome.tabs.query({ url: ['*://*.ciasc.sc.gov.br/*', '*://*.ssp.sc.gov.br/*'] }, function (tabs) {
     if (tabs && tabs.length > 0) {
       // Prioriza a aba ativa no momento ou a primeira encontrada
       var best = tabs.find(t => t.active) || tabs[0];

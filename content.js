@@ -40,39 +40,37 @@ function isMainFrame() {
 }
 
 function isFormFrame() {
-  if (window.self === window.top) return false;
-
   // Angular elements or specific structure
   if (document.querySelector('boin-arvore-registro')) return true;
   if (document.querySelector('.arvore-registro')) return true;
   if (document.querySelector('mat-expansion-panel')) return true;
 
   var text = '';
-  try { text = document.body.innerText || ''; } catch (e) { return false; }
+  try { text = document.body ? (document.body.innerText || '') : ''; } catch (e) { return false; }
 
-  // More relaxed keywords for form
+  // More relaxed keywords for form (supports both modern Angular and Legacy portal)
   var hasMarkers = (
     text.includes('Encaminhamento Interno') ||
     text.includes('Outros Despachos') ||
     text.includes('Histórico do BO') ||
+    text.includes('Historico do BO') ||
     text.includes('Esclarecimento / Despacho') ||
-    text.includes('Salvar') && text.includes('BO')
+    text.includes('Relato Individual') ||
+    (text.includes('Salvar') && (text.includes('BO') || text.includes('Despacho') || text.includes('Ocorrência') || text.includes('Ocorrencia')))
   );
 
   return hasMarkers && text.length > 50;
 }
 
 function isListFrame() {
-  if (window.self === window.top) return false;
-
   // Relaxed table detection
   var hasTable = document.querySelector('table, tbody, .table');
   if (!hasTable) return false;
 
   var text = '';
-  try { text = (document.body.innerText || '').toLowerCase(); } catch (e) { return false; }
+  try { text = (document.body ? (document.body.innerText || '') : '').toLowerCase(); } catch (e) { return false; }
 
-  // Pattern for BO number (e.g. 123/2023 or 1234/2024)
+  // Pattern for BO number (e.g. 123/2023 or 1234/2024 or 12345/2024)
   var hasBoPattern = /\d+\/\d{4}/.test(text);
 
   // High confidence markers for list
@@ -83,6 +81,9 @@ function isListFrame() {
     text.includes('registros desta unidade') ||
     text.includes('recebidos de outras unidades') ||
     text.includes('administração de despachos') ||
+    text.includes('administracao de despachos') ||
+    text.includes('boletins de ocorrencia') ||
+    text.includes('boletins de ocorrência') ||
     (text.includes('bo') && hasBoPattern)
   );
 
@@ -292,17 +293,20 @@ function debugDOM() {
 }
 
 // ============================
-// WAIT FOR ANGULAR
+// WAIT FOR ELEMENT / ANGULAR
 // ============================
 async function waitForAngular(selector, timeout) {
   timeout = timeout || 12000;
+  // Se o seletor já existe e está acessível, retorna imediatamente
+  if (document.querySelector(selector)) return true;
+
   var elapsed = 0;
   while (elapsed < timeout) {
     var loader = document.querySelector('.ngx-overlay');
     var loaderGone = !loader || loader.style.opacity === '0' || loader.style.display === 'none' || !loader.offsetParent;
     if (loaderGone && document.querySelector(selector)) return true;
-    await sleep(250);
-    elapsed += 250;
+    await sleep(200);
+    elapsed += 200;
   }
   return !!document.querySelector(selector);
 }
