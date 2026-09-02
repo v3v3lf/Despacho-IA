@@ -398,10 +398,10 @@ function updateMarkItDownUI(markdownText, rawText, metadata = {}) {
   // Atualiza Badge de Economia
   if (tokenBadge) {
     if (currentTokenStats && currentTokenStats.savedPercent > 0) {
-      tokenBadge.textContent = `⚡ MarkItDown: -${currentTokenStats.savedPercent}% tokens`;
+      tokenBadge.textContent = `⚡ Otimizado: -${currentTokenStats.savedPercent}%`;
       tokenBadge.classList.remove('hidden');
     } else if (currentMarkdownDoc) {
-      tokenBadge.textContent = `⚡ MarkItDown Ativo`;
+      tokenBadge.textContent = `⚡ Estruturado`;
       tokenBadge.classList.remove('hidden');
     } else {
       tokenBadge.classList.add('hidden');
@@ -581,23 +581,28 @@ async function gerarResumoRelatoIA(documentoMarkdownOuTexto, fatos) {
 
   const currentModel = providerModels[activeProvider] || providerConfig.defaultModel;
 
-  addLog(`Enviando documento MarkItDown (${textoDoc.length} chars) para ${providerConfig.name} (${currentModel})...`, 'info');
-  console.log(`[Despacho IA] Enviando para ${providerConfig.name} [${currentModel}] (${textoDoc.length} chars MarkItDown)`);
+  addLog(`Enviando relato do BO (${textoDoc.length} chars) para ${providerConfig.name} (${currentModel})...`, 'info');
+  console.log(`[Despacho IA] Enviando para ${providerConfig.name} [${currentModel}] (${textoDoc.length} chars)`);
 
-  const systemInstruction = `Você é um analista de dados policiais especialista em extrair dados estruturados de Boletins de Ocorrência do SISP.
-Sua tarefa é ler todo o documento do Boletim de Ocorrência estruturado em Markdown fornecido e criar um resumo fluido, contínuo e em parágrafo único.
+  const systemInstruction = `Você é um analista sênior de inteligência policial especialista em Boletins de Ocorrência do sistema SISP (Polícia Civil de Santa Catarina).
+Sua tarefa primordial é ler o documento estruturado do Boletim de Ocorrência em Markdown e PRODUZIR UMA SÍNTESE EXTREMAMENTE COMPLETA E RICA EM DETALHES DA NARRATIVA DOS FATOS (focando obrigatoriamente no texto situado entre "Relato Individual" e "Outras Informações").
 
-Instruções específicas:
-1. Inicie obrigatoriamente com o padrão: "o BO-[NÚMERO DO BO]" (ex: "o BO-00614.2026.0030318"). Utilize o número do BO no formato de registro (ex: "00127.2026.0001088").
-2. No mesmo parágrafo, de forma corrida (sem quebras de linha ou divisões), informe: os fatos comunicados, a data/horário, o endereço do ocorrido, o comunicante, a(s) vítima(s) e o autor do crime (caso identificado nas tabelas ou relato).
-3. Inclua a dinâmica do fato de forma detalhada, especificando todas as ações relatadas e todos os objetos/bens/valores subtraídos ou transacionados descritos no Markdown.
-4. Nunca invente ou assuma informações não descritas explicitamente no documento estruturado fornecido.
-5. Se autor ou testemunhas não forem citados ou forem declarados como desconhecidos, simplesmente não os mencione no texto.
-6. ATENÇÃO: O resumo deve ser concluído com um ponto final e conter todo o relato estruturado, sem ser cortado ou truncado no meio de uma frase.`;
+DIRETRIZES OBRIGATÓRIAS DE SÍNTESE POLICIAL:
+1. FOCO OBRIGATÓRIO NO RELATO INDIVIDUAL:
+   - O texto localizado entre "Relato Individual" e "Outras Informações" contém o depoimento e a narrativa da vítima/comunicante.
+   - É OBRIGATÓRIO resumir toda a dinâmica detalhada: como os fatos começaram, as mensagens/ligações, propostas, abordagem do autor, o engano ou ameaça, valores transferidos/subtraídos, chaves PIX, contas de favorecidos, produtos, cartões e como o delito se consumou.
+2. ESTRUTURAÇÃO DO PARÁGRAFO:
+   - Inicie obrigatoriamente com o padrão: "o BO-[NÚMERO DO BO]" (ex: "o BO-00614.2026.0030318" ou o número do registro constante no documento).
+   - Mantenha tudo em um PARÁGRAFO ÚNICO, contínuo, denso e bem articulado.
+   - Informe os fatos comunicados, data, horário, local/endereço, o comunicante, a(s) vítima(s), o(s) autor(es) (se identificados), a dinâmica completa extraída do Relato Individual e as providências.
+3. RIQUEZA DE DETALHES E PRECISÃO:
+   - Não gere resumos telegráficos ou com poucas palavras. Explique claramente o que aconteceu com base no Relato Individual.
+   - Se autor ou testemunhas forem desconhecidos ou não citados, não os mencione. Nunca invente dados ausentes no documento.
+4. Conclua sempre com ponto final.`;
 
   const prompt = `### BOLETIM DE OCORRÊNCIA ESTRUTURADO (MARKDOWN):
 ---
-${textoDoc.slice(0, 16000)}
+${textoDoc.slice(0, 18000)}
 ---`;
 
   try {
@@ -609,7 +614,7 @@ ${textoDoc.slice(0, 16000)}
       systemInstruction: systemInstruction,
       enableWebSearch: enableWebSearch,
       temperature: 0.1,
-      maxTokens: 1400,
+      maxTokens: 1600,
       onRetry: (attempt, maxAttempts, delay, err) => {
         addLog(`API ${providerConfig.name} instável (${err.message}). Tentativa ${attempt}/${maxAttempts}...`, 'warning');
       }
@@ -750,7 +755,7 @@ async function checkTab() {
 
 // Find the SISP tab regardless of window
 async function findTargetTab() {
-  // Try matching any SISP/CIASC/SSP subdomains first
+  // 1. Tenta encontrar abas com URLs conhecidas do SISP/CIASC/SSP
   try {
     const tabs = await chrome.tabs.query({ url: ['*://*.ciasc.sc.gov.br/*', '*://*.ssp.sc.gov.br/*'] });
     if (tabs && tabs.length > 0) {
@@ -761,15 +766,25 @@ async function findTargetTab() {
     console.warn('[Popup] Erro na busca de abas do SISP:', e);
   }
 
-  // Fallback: check all active tabs across normal browser windows
+  // 2. Busca ampla em todas as abas por URLs que contenham ciasc/ssp
   try {
-    const activeTabs = await chrome.tabs.query({ active: true });
-    if (activeTabs && activeTabs.length > 0) {
+    const allTabs = await chrome.tabs.query({});
+    if (allTabs && allTabs.length > 0) {
       const currentWin = await chrome.windows.getCurrent();
-      const nonPopup = activeTabs.find(t => t.windowId !== currentWin.id && t.url && (t.url.includes('ciasc.sc.gov.br') || t.url.includes('ssp.sc.gov.br')));
-      if (nonPopup) return nonPopup;
+      const sispTab = allTabs.find(t => t.url && (t.url.includes('ciasc.sc.gov.br') || t.url.includes('ssp.sc.gov.br')));
+      if (sispTab) return sispTab;
+
+      // 3. Fallback: Qualquer aba ativa em outra janela que não seja popup/extensão
+      const nonPopupActive = allTabs.find(t => t.active && t.windowId !== currentWin.id && t.url && !t.url.startsWith('chrome-extension://'));
+      if (nonPopupActive) return nonPopupActive;
+
+      // 4. Fallback: Qualquer aba comum
+      const anyNonExt = allTabs.find(t => t.url && !t.url.startsWith('chrome-extension://') && !t.url.startsWith('chrome://'));
+      if (anyNonExt) return anyNonExt;
     }
-  } catch (e) {}
+  } catch (e) {
+    console.warn('[Popup] Erro no fallback de abas:', e);
+  }
 
   return null;
 }
@@ -782,11 +797,11 @@ async function sendToTab(type, extra) {
     return null;
   }
 
-  // SEMPRE injeta o content script para garantir que ele esteja presente (mesmo após recarregar a página)
+  // SEMPRE injeta os content scripts para garantir que estejam presentes (mesmo após recarregar a página)
   try {
     await chrome.scripting.executeScript({
       target: { tabId: tab.id, allFrames: true },
-      files: ['content.js']
+      files: ['src/markitdown_engine.js', 'src/markitdown_cleaner.js', 'content.js']
     });
   } catch (e) {
     // Silencioso se falhar (pode ser problema de permissão em frames cross-origin, o que é esperado no SISP)
@@ -1110,8 +1125,7 @@ async function triggerStep3() {
     if (!/relato\s+individual/i.test(currentRelatoText)) {
       addLog('Relato não encontrado no frame principal. Buscando em todos os frames...', 'warning');
       try {
-        const tabs = await new Promise(r => chrome.tabs.query({ active: true, currentWindow: true }, r));
-        const tab = tabs && tabs[0];
+        const tab = await findTargetTab();
         
         if (tab) {
           const injectionResults = await chrome.scripting.executeScript({
@@ -1143,63 +1157,188 @@ async function triggerStep3() {
   onStepDone(3);
 }
 
-// STEP 3.1 - Resumir com IA (manual) — texto já extraído no step 3
+// STEP 3.1 - Resumir com IA (manual)
 
 async function triggerStep3_1() {
-  if (!currentTipo) {
-    addLog('Execute o passo ③ Analisar antes de resumir com IA.', 'warning');
+  console.log('[Popup] Botão 3.1 Resumir com IA acionado');
+  showSection('secResumoIA');
+  renderAnalysisBox(currentFatos || '', null, '', '⟳ Estruturando relato e gerando resumo com IA...');
+  setStatus('Processando com IA...', 'active');
+  addLog('Extraindo e estruturando dados do BO...', 'info');
+
+  const tab = await findTargetTab();
+  if (!tab) {
+    const err = 'Nenhuma aba do SISP detectada! Abra o SISP para resumir o BO.';
+    renderAnalysisBox(currentFatos || '', null, 'error', err);
+    addLog(err, 'error');
+    setStatus('SISP não encontrado', 'error');
     return;
   }
 
-  showSection('secResumoIA');
-  renderAnalysisBox(currentFatos, null, '', '⟳ Estruturando com MarkItDown e gerando resumo...');
-  setStatus('Processando com MarkItDown & IA...', 'active');
-  addLog('Extraindo e estruturando frames do SISP com MarkItDown...', 'info');
+  // 1. Garante injeção dos scripts MarkItDown e content na aba
+  try {
+    await chrome.scripting.executeScript({
+      target: { tabId: tab.id, allFrames: true },
+      files: ['src/markitdown_engine.js', 'src/markitdown_cleaner.js', 'content.js']
+    });
+  } catch(e) {
+    console.warn('[Despacho IA] Injeção de scripts no 3.1:', e.message);
+  }
 
+  // Função para pontuar e priorizar o conteúdo do BO real descartando listas gerais
+  function scoreFrameContent(f) {
+    if (!f || (!f.text && !f.html)) return -9999;
+    const text = (f.text || '').toLowerCase();
+    let score = 0;
+
+    if (/relato\s+individual/i.test(text)) score += 10000;
+    if (/hist[óo]rico\s+(?:dos\s+fatos|da\s+ocorr[êe]ncia)/i.test(text)) score += 3000;
+    if (/fatos?\s+comunicados?/i.test(text)) score += 2000;
+    if (/partes\s+envolvidas|envolvidos\s+no\s+fato|comunicante|v[íi]tima|autor\b/i.test(text)) score += 1500;
+    if (/dados\s+gerais\s+do\s+registro|boletim\s+de\s+ocorr[êe]ncia/i.test(text)) score += 1000;
+    if (/encaminhamento\s+interno/i.test(text)) score += 800;
+    if (/objetos?|ve[íi]culos?|valores/i.test(text)) score += 600;
+
+    // Penalização severa se for apenas a tabela/tela de Administração de Despachos sem relato individual
+    if (/administra[çc][ãa]o\s+de\s+despachos|registros\s+desta\s+unidade|recebidos\s+de\s+outras\s+unidades/i.test(text) && !/relato\s+individual/i.test(text)) {
+      score -= 8000;
+    }
+
+    return score;
+  }
+
+  // 2. Tenta capturar frames via executeScript com busca específica pelo Relato Individual
   let rawFullText = '';
   let markdownConverted = '';
+  let relatoCapturadoDOM = '';
+  let frames = [];
+
+  const scriptExtratorBO = () => {
+    if (!document.body) return null;
+    const bodyText = document.body.innerText || document.body.textContent || '';
+    
+    // Extração específica do texto entre "Relato Individual" e "Outras Informações"
+    let relatoEspecifico = '';
+    const regexEntreRelatoEOutras = /(?:relato\s+individual|relato\s+individual\s*:)\s*([\s\S]*?)(?=(?:outras\s+informa[çc][õo]es|outras\s+informacoes|dados\s+do\s+relato|hist[óo]rico\s+de\s+altera[çc][õo]es|envolvidos\s+no\s+fato|dados\s+do\s+bo|classifica[çc][ãa]o|unidade\s+policial|\n##|\n#|$))/i;
+    const match = bodyText.match(regexEntreRelatoEOutras);
+    if (match && match[1] && match[1].trim().length > 15) {
+      relatoEspecifico = match[1].trim();
+    }
+
+    return {
+      html: document.body.innerHTML || '',
+      text: bodyText,
+      relatoIndividual: relatoEspecifico,
+      url: window.location.href || ''
+    };
+  };
 
   try {
-    const tabs = await new Promise(r => chrome.tabs.query({ active: true, currentWindow: true }, r));
-    const tab = tabs && tabs[0];
-    if (tab) {
-      const injectionResults = await chrome.scripting.executeScript({
-        target: { tabId: tab.id, allFrames: true },
-        func: () => {
-          if (!document.body) return null;
-          return {
-            html: document.body.innerHTML || '',
-            text: document.body.innerText || document.body.textContent || ''
-          };
+    const injectionResults = await chrome.scripting.executeScript({
+      target: { tabId: tab.id, allFrames: true },
+      func: scriptExtratorBO
+    });
+
+    if (injectionResults && injectionResults.length > 0) {
+      frames = injectionResults
+        .map(frame => frame.result)
+        .filter(res => res && res.text && res.text.trim().length > 20);
+
+      // Verifica se algum frame já trouxe o relato individual direto
+      frames.forEach(f => {
+        if (f.relatoIndividual && f.relatoIndividual.length > relatoCapturadoDOM.length) {
+          relatoCapturadoDOM = f.relatoIndividual;
         }
       });
+    }
+  } catch (e) {
+    console.error('[Despacho IA] Erro ao inspecionar frames:', e);
+  }
 
-      if (injectionResults && injectionResults.length > 0) {
-        const validFrames = injectionResults
+  // 3. Verifica a pontuação do melhor frame encontrado
+  let bestScore = -9999;
+  frames.forEach(f => {
+    const s = scoreFrameContent(f);
+    if (s > bestScore) bestScore = s;
+  });
+
+  // Se o relato individual não estiver aberto na tela, tenta acionar STEP2_OPEN_BO para carregar os detalhes
+  if (bestScore < 2000 && !relatoCapturadoDOM) {
+    addLog('Relato do BO não visível. Abrindo detalhes do BO no SISP...', 'info');
+    try {
+      await sendToTab('STEP2_OPEN_BO');
+      await sleep(700);
+
+      const injectionResults2 = await chrome.scripting.executeScript({
+        target: { tabId: tab.id, allFrames: true },
+        func: scriptExtratorBO
+      });
+      if (injectionResults2 && injectionResults2.length > 0) {
+        frames = injectionResults2
           .map(frame => frame.result)
           .filter(res => res && res.text && res.text.trim().length > 20);
 
-        rawFullText = validFrames.map(f => f.text.trim()).join('\n\n---\n\n');
-
-        // Conversão com MarkItDown Engine
-        if (typeof MarkItDownEngine !== 'undefined') {
-          const engine = new MarkItDownEngine();
-          const frameMds = validFrames.map(f => engine.convert(f.html));
-          markdownConverted = frameMds.filter(m => m.trim().length > 0).join('\n\n---\n\n');
-        } else {
-          markdownConverted = rawFullText;
-        }
+        frames.forEach(f => {
+          if (f.relatoIndividual && f.relatoIndividual.length > relatoCapturadoDOM.length) {
+            relatoCapturadoDOM = f.relatoIndividual;
+          }
+        });
       }
-    }
-  } catch (e) {
-    console.error('[Despacho IA] Erro ao extrair frames com MarkItDown:', e);
+    } catch(e) {}
   }
 
-  if (!rawFullText) {
+  // 4. Também verifica se o storage possui cache recente do Relato Individual
+  let relatoStorage = null;
+  try {
+    const stored = await new Promise(r => chrome.storage.local.get(['_sispRelatoText', '_sispRelatoMarkdown', '_sispRelatoTimestamp'], r));
+    if (stored._sispRelatoText && /relato\s+individual/i.test(stored._sispRelatoText)) {
+      const age = Date.now() - (stored._sispRelatoTimestamp || 0);
+      if (age < 120000) { // Menos de 2 minutos
+        relatoStorage = stored;
+      }
+    }
+  } catch(e) {}
+
+  // 5. Filtra frames com score relevante (elimina a tela de listagem de despachos)
+  const usefulFrames = frames
+    .map(f => ({ frame: f, score: scoreFrameContent(f) }))
+    .filter(item => item.score > -2000)
+    .sort((a, b) => b.score - a.score);
+
+  if (usefulFrames.length > 0) {
+    const engine = (typeof MarkItDownEngine !== 'undefined') ? new MarkItDownEngine() : null;
+    const texts = usefulFrames.map(item => item.frame.text.trim());
+    rawFullText = texts.join('\n\n---\n\n');
+
+    if (engine) {
+      const mds = usefulFrames.map(item => engine.convert(item.frame.html || item.frame.text));
+      markdownConverted = mds.filter(m => m && m.trim().length > 0).join('\n\n---\n\n');
+    } else {
+      markdownConverted = rawFullText;
+    }
+  }
+
+  // Injeta o relato individual capturado se ele for mais detalhado
+  if (relatoCapturadoDOM && (!rawFullText.includes(relatoCapturadoDOM))) {
+    rawFullText = `RELATO INDIVIDUAL DOS FATOS:\n${relatoCapturadoDOM}\n\nOUTRAS INFORMAÇÕES:\n${rawFullText}`;
+    markdownConverted = `\n\n## 4. RELATO INDIVIDUAL DOS FATOS (NARRATIVA PRINCIPAL)\n\n> **RELATO INDIVIDUAL INTEGRAL:**\n> ${relatoCapturadoDOM.replace(/\n+/g, '\n> ')}\n\n${markdownConverted}`;
+  }
+
+  // Mescla o relato individual do storage se complementar
+  if (relatoStorage && relatoStorage._sispRelatoText) {
+    if (!rawFullText || !/relato\s+individual/i.test(rawFullText)) {
+      rawFullText = (relatoStorage._sispRelatoText + '\n\n' + rawFullText).trim();
+      if (relatoStorage._sispRelatoMarkdown) {
+        markdownConverted = (relatoStorage._sispRelatoMarkdown + '\n\n' + markdownConverted).trim();
+      }
+    }
+  }
+
+  if (!rawFullText && currentRelatoText) {
     rawFullText = currentRelatoText;
   }
 
-  if (!markdownConverted) {
+  if (!markdownConverted && rawFullText) {
     if (typeof MarkItDownEngine !== 'undefined') {
       const engine = new MarkItDownEngine();
       markdownConverted = engine.convert(rawFullText);
@@ -1208,39 +1347,64 @@ async function triggerStep3_1() {
     }
   }
 
-  // Sanitização e Frontmatter
+  // 6. Extração de Metadados (Número do BO e Fatos)
+  let boNum = '';
+  const matchBoNum = (rawFullText + '\n' + markdownConverted).match(/(?:boletim\s+de\s+ocorr[êe]ncia|bo|registro)[:\s#º°nN]*([0-9]{4,6}[\.\/][0-9]{4}[\.\/][0-9]{4,8}|[0-9]{1,8}[\/\-][0-9]{4}(?:-[A-Z]+)?)/i)
+    || (rawFullText + '\n' + markdownConverted).match(/([0-9]{5}\.[0-9]{4}\.[0-9]{7})/);
+  if (matchBoNum && matchBoNum[1]) {
+    boNum = matchBoNum[1].trim();
+  }
+
+  if (!currentFatos && rawFullText) {
+    const matchFato = rawFullText.match(/FATOS?\s+COMUNICADOS?[:\s]+([^\n\r]+)/i);
+    if (matchFato && matchFato[1]) {
+      currentFatos = matchFato[1].trim();
+    }
+  }
+
+  // 7. Sanitização e Frontmatter MarkItDown
   let markdownFinal = markdownConverted;
-  if (typeof MarkItDownCleaner !== 'undefined') {
+  if (typeof MarkItDownCleaner !== 'undefined' && markdownConverted) {
     markdownFinal = MarkItDownCleaner.sanitize(markdownConverted, {
+      boNumber: boNum || '',
       fato: currentFatos || currentTipo || ''
     });
+  }
+
+  if (!markdownFinal || markdownFinal.trim().length < 30) {
+    const emptyMsg = 'Nenhum texto de Boletim de Ocorrência detalhado encontrado na página. Abra o BO no SISP antes de resumir.';
+    renderAnalysisBox(currentFatos, null, 'warning', emptyMsg);
+    addLog(emptyMsg, 'warning');
+    setStatus('BO não encontrado na página', 'error');
+    return;
   }
 
   // Atualiza painel e métricas de tokens do MarkItDown
   updateMarkItDownUI(markdownFinal, rawFullText);
 
   const providerCfg = (typeof getProviderConfig === 'function') ? getProviderConfig(activeProvider) : { name: 'IA' };
-  addLog(`Chamando API ${providerCfg.name} com documento MarkItDown...`, 'info');
+  addLog(`Chamando API ${providerCfg.name} para análise do BO...`, 'info');
 
   try {
     const resumoRes = await gerarResumoRelatoIA(markdownFinal, currentFatos);
     if (resumoRes.ok) {
       currentResumoIA = resumoRes.resumo;
       renderAnalysisBox(currentFatos, currentResumoIA);
-      addLog('Resumo IA gerado com sucesso via MarkItDown', 'success');
+      addLog('Resumo IA gerado com sucesso', 'success');
       const btn31 = document.getElementById('btnM3_1');
       if (btn31) btn31.classList.add('success');
+      setStatus('Resumo gerado com sucesso ✓', 'success');
     } else {
       renderAnalysisBox(currentFatos, null, resumoRes.skipped ? 'warning' : 'error', resumoRes.message);
       addLog(resumoRes.message, resumoRes.skipped ? 'warning' : 'error');
+      setStatus(resumoRes.skipped ? 'Configure a chave da IA em ⚙ REGRAS' : 'Falha na resposta da IA', 'error');
     }
   } catch (e) {
     const msg = 'Falha ao gerar resumo IA: ' + (e.message || e);
     renderAnalysisBox(currentFatos, null, 'error', msg);
     addLog(msg, 'error');
+    setStatus('Erro na chamada da IA', 'error');
   }
-
-  setStatus('BO analisado — aguardando sua ação', 'success');
 }
 
 function updateDespachoUI(tipo, despacho) {

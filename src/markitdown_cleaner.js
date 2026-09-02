@@ -54,7 +54,13 @@
         /Versão\s+do\s+Sistema:\s*[\d\.]+/gi,
         /Todos\s+os\s+direitos\s+reservados/gi,
         /Imprimir\s+BO|Salvar\s+PDF|Voltar/gi,
-        /SISP\s*-\s*Sistema\s+Integrado\s+de\s+Segurança\s+Pública/gi
+        /SISP\s*-\s*Sistema\s+Integrado\s+de\s+Segurança\s+Pública/gi,
+        /Administra[çc][ãa]o\s+de\s+Despachos/gi,
+        /Registros\s+desta\s+unidade/gi,
+        /Recebidos\s+de\s+outras\s+unidades/gi,
+        /Visualizar\s+impress[ãa]o/gi,
+        /Exportar\s+(?:para\s+)?Excel|Exportar\s+PDF/gi,
+        /Filtrar\s+por\s+unidade|Buscar\s+registro/gi
       ];
 
       noisePatterns.forEach(pattern => {
@@ -91,12 +97,23 @@
         '\n# BOLETIM DE OCORRÊNCIA Nº $1\n'
       );
 
+      // Tratamento específico e prioritário para o trecho entre "Relato Individual" e "Outras Informações"
+      const relatoRegex = /(?:relato\s+individual|relato\s+individual\s*:)\s*([\s\S]*?)(?=(?:outras\s+informa[çc][õo]es|outras\s+informacoes|dados\s+do\s+relato|hist[óo]rico\s+de\s+altera[çc][õo]es|envolvidos\s+no\s+fato|dados\s+do\s+bo|classifica[çc][ãa]o|unidade\s+policial|\n##|\n#|$))/i;
+      const relatoMatch = structured.match(relatoRegex);
+      if (relatoMatch && relatoMatch[1] && relatoMatch[1].trim().length > 15) {
+        const relatoConteudo = relatoMatch[1].trim();
+        const blocoRelato = `\n\n## 4. RELATO INDIVIDUAL DOS FATOS (NARRATIVA PRINCIPAL)\n\n> **RELATO INDIVIDUAL INTEGRAL:**\n> ${relatoConteudo.replace(/\n+/g, '\n> ')}\n\n`;
+        // Substitui a ocorrência para colocar a seção formatada
+        structured = structured.replace(relatoMatch[0], blocoRelato);
+      }
+
       // Padronização de títulos de seções comuns do SISP
       const sectionKeywords = [
         { regex: /(?:^|\n)#*\s*(dados\s+gerais|informa[çc][õo]es\s+do\s+registro)/i, title: '\n## 1. DADOS GERAIS DO REGISTRO\n' },
         { regex: /(?:^|\n)#*\s*(envolvidos(?:\s+no\s+fato)?|partes(?:\s+envolvidas)?|v[íi]tima[s]?|autor(?:es)?)/i, title: '\n## 2. PARTES ENVOLVIDAS\n' },
         { regex: /(?:^|\n)#*\s*(objetos|ve[íi]culos|bens(?:\s+apreendidos)?|transa[çc][õo]es|valores)/i, title: '\n## 3. OBJETOS, VALORES E TRANSAÇÕES\n' },
-        { regex: /(?:^|\n)#*\s*(hist[óo]rico(?:\s+dos\s+fatos)?|relato(?:\s+individual|\s+dos\s+fatos)?|narrativa)/i, title: '\n## 4. HISTÓRICO / RELATO DOS FATOS\n' },
+        { regex: /(?:^|\n)#*\s*(outras\s+informa[çc][õo]es|outras\s+informacoes)/i, title: '\n## 4.1. OUTRAS INFORMAÇÕES DO REGISTRO\n' },
+        { regex: /(?:^|\n)#*\s*(hist[óo]rico(?:\s+dos\s+fatos)?|relato(?:\s+dos\s+fatos)?|narrativa)/i, title: '\n## 4. HISTÓRICO / RELATO DOS FATOS\n' },
         { regex: /(?:^|\n)#*\s*(despachos|andamentos|encaminhamentos|hist[óo]rico\s+do\s+bo)/i, title: '\n## 5. HISTÓRICO DE DESPACHOS E ANDAMENTOS\n' }
       ];
 
