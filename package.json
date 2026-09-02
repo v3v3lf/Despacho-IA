@@ -4,7 +4,8 @@
   "description": "1. Abra o Chrome e acesse: `chrome://extensions/` 2. Ative o **Modo do desenvolvedor** (canto superior direito) 3. Clique em **\"Carregar sem compactação\"** 4. Selecione a pasta **`Extensao-3`** 5. A extensão aparecerá com o ícone verde \"BO\" na barra do Chrome",
   "main": "background.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:zip": "rm -f despacho-ia-extension.zip && zip -r despacho-ia-extension.zip manifest.json background.js content.js popup.html popup.css popup.js auth.js supabase-config.js icons src -x \"*.DS_Store*\" -x \"__MACOSX*\""
   },
   "keywords": [],
   "author": "",
