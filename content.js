@@ -8,9 +8,9 @@ if (window.__sispInjected) {
 } else {
   window.__sispInjected = true;
 
-// ---- AUTO-DETECÇÃO DO RELATO INDIVIDUAL ----
+// ---- AUTO-DETECÇÃO DO RELATO INDIVIDUAL COM MARKITDOWN ----
 // A cada 2 segundos (por 30 seg), verifica se este frame contém "Relato Individual:"
-// Se encontrar, salva o texto completo no chrome.storage para o popup consumir.
+// Se encontrar, salva o texto bruto e o Markdown estruturado no chrome.storage para o popup consumir.
 (function autoDetectRelato() {
   var checks = 0;
   var maxChecks = 15; // 15 * 2s = 30 segundos
@@ -20,8 +20,27 @@ if (window.__sispInjected) {
     try {
       var bodyText = document.body ? (document.body.innerText || document.body.textContent || '') : '';
       if (/relato\s+individual/i.test(bodyText)) {
-        chrome.storage.local.set({ _sispRelatoText: bodyText, _sispRelatoTimestamp: Date.now() });
-        console.log('[BO Extension] Relato Individual DETECTADO neste frame (' + bodyText.length + ' chars). Salvo no storage.');
+        var mdText = '';
+        try {
+          if (typeof MarkItDownEngine !== 'undefined') {
+            var engine = new MarkItDownEngine();
+            var rawMd = engine.convert(document.body);
+            if (typeof MarkItDownCleaner !== 'undefined') {
+              mdText = MarkItDownCleaner.sanitize(rawMd, { boNumber: '', fato: '' });
+            } else {
+              mdText = rawMd;
+            }
+          }
+        } catch(errMd) {
+          console.error('[BO Extension] Erro ao converter via MarkItDown:', errMd);
+        }
+
+        chrome.storage.local.set({
+          _sispRelatoText: bodyText,
+          _sispRelatoMarkdown: mdText,
+          _sispRelatoTimestamp: Date.now()
+        });
+        console.log('[BO Extension] Relato Individual DETECTADO (' + bodyText.length + ' chars, MD: ' + mdText.length + ' chars). Salvo no storage.');
         clearInterval(interval);
       }
     } catch(e) {}
@@ -108,6 +127,33 @@ var DESPACHOS = {
   decidir_posteriormente: 'VISTOS (Decidir posteriormente). \nAGUARDE-SE A MANIFESTACAO DA VITIMA no prazo decadencial, conforme a cientificacao constante no Boletim de Ocorrencia, em que a vitima Deseja Decidir posteriormente sobre o direito de representacao ou queixa, estando ciente de que o prazo para oferecer a representacao ou a queixa e de 06 (seis) meses, contados da data do fato ou da data em que vier a saber quem e o autor do fato. Pois, nos termos do artigo 5o do CPP: "Par. 4o O inquerito, nos crimes em que a acao publica depender de representacao, nao podera sem ela ser iniciado.; e, \nPar. 5o Nos crimes de acao privada, a autoridade policial somente podera proceder a inquerito a requerimento de quem tenha qualidade para intenta-la."',
   investigacao: 'Efetuar a VERIFICACAO PRELIMINAR DAS INFORMACOES do presente Boletim de Ocorrencia para a identificacao do autor(es), de acordo com as informacoes trazidas, dos termos do artigo 5o, paragrafo 3o do CPP. Caso as diligencias investigatorias realizadas nao seja possivel identificar o(s) autor(es), aguarde-se outro elemento de informacao caracterizador da autoria do delito, nao necessitando realizar nova tramitacao, pois em face da carencia de substrato fatico criminal razoavel a indicacao de da autoria delitiva. Por oportuno, nao custa lembrar que, segundo entendimento do proprio STF, a instauracao regular de procedimento investigativo depende necessariamente de "base empirica para tanto idonea e indicacao plausivel do fato delituoso a ser apurado" (STF - Primeira Turma - Inq 3847 AgR/GO - Rel. Min. Dias Toffoli - j. em 07.04.2015 - Dje 108 de 05.06.2015 / STF - Primeira Turma - Pet 7354 AgR/DF - Rel. Min. Dias Toffoli - j. em 06.03.2018 - Dje 102 de 24.05.2018), o que inexiste no caso em questao.',
   estelionato: 'Intimar a vítima para comparecer na delegacia para prestar termo de declaração preliminar e juntar os documentos comprobatórios, caso não compareça anexar no SISP esta informação e marcar como resolvido sem necessidade de tramitação. Deixar consignado na intimação que a vítima deverá:\nTrazer documentos que contenham o nome do banco, número da agência (cidade e bairro) e conta corrente do GOLPISTA na qual foi realizado o DEPÓSITO, ou esclarecer que não houve transferência (art. 70, §4, CPP -domicílio da vítima) e juntar o documento comprobatório;\nO documento que contenha o nome do banco, número da agência(cidade e bairro) da VÍTIMA no caso de FURTO de valores da CONTA (ag. da vítima);\nOu documentos para demonstrar o local onde foi efetuada a compra fraudulenta do produto, bairro, cidade e estado em que o autor foi beneficiado com a COMPRA utilizando-se de CARTÃO CLONADO (local da compra no estabelecimento comercial) e juntar o documento comprobatório;\nOu documentos que contenham o nome do banco, número da agência(cidade e bairro) e conta corrente de onde ocorreu o SAQUE de valor com uso de CARTÃO CLONADO (local onde ocorreu o saque fraudulento);\nPara a vítima informar onde foi o local em que ocorreu a ENTREGA A MERCADORIA (retirada do produto) e juntar o documento comprobatório;',
+  estelionato_insignificancia: `Vistos,
+Trata-se de notícia-crime registrada mediante Boletim de Ocorrência que noticia, em tese, a suposta prática do delito de estelionato (art. 171 do Código Penal).
+Constata-se dos autos que o prejuízo econômico suportado pela vítima/vantagem ilícita auferida reveste-se de valor inexpressivo, sendo o fato despido de violência física, grave ameaça ou periculosidade social, impondo-se a análise da incidência do princípio da insignificância (crime de bagatela) à luz da Nota Técnica nº 007/2026/CAAPJ/ASJUR/DGPC da Polícia Civil do Estado de Santa Catarina.
+I. DA EXCLUSÃO DA TIPICIDADE MATERIAL PELO PRINCÍPIO DA INSIGNIFICÂNCIA
+Segundo a teoria tripartite do delito, a infração penal compõe-se analiticamente de fato típico, ilícito e culpável, sendo o primeiro substrato constituído por conduta, resultado, nexo causal e tipicidade. A tipicidade compreende as dimensões formal (juízo de subsunção entre o fato e o modelo abstrato da lei) e material (efetiva lesão ou perigo concreto de lesão ao bem jurídico tutelado).
+O princípio da insignificância, como vetor de política criminal (Claus Roxin), opera como causa supralegal de exclusão da tipicidade material por meio de interpretação restritiva do tipo penal, tornando a conduta formalmente típica em irrelevante penal, ante a ausência de lesão ou de perigo relevante de lesão ao bem jurídico albergado diante da inexpressividade do comportamento praticado (STF, HC 104.787/RJ, Rel. Min. Ayres Britto; Carlos Vico Mañas; Eugenio Raúl Zaffaroni; Pierpaolo Cruz Bottini).
+II. DOS REQUISITOS OBJETIVOS E CRITÉRIOS DE INCIDÊNCIA (STF E STJ)
+Conforme fixado pelo Supremo Tribunal Federal (HC 84.412/SP, Rel. Min. Celso de Mello), o reconhecimento da insignificância reclama a presença cumulativa dos seguintes requisitos objetivos:
+a) mínima ofensividade da conduta do agente;
+b) nenhuma periculosidade social da ação;
+c) reduzidíssimo grau de reprovabilidade do comportamento;
+d) inexpressividade da lesão jurídica provocada.
+No plano dos crimes patrimoniais, o Superior Tribunal de Justiça (STJ) adota a diretriz geral de que o valor da res/prejuízo não ultrapasse 10% (dez por cento) do salário-mínimo vigente à época dos fatos (STJ, AgRg no REsp 1.992.226/RS), admitindo-se a flexibilização do parâmetro para patamares em torno de 30% (trinta por cento) do salário-mínimo conforme as peculiaridades do caso concreto (STJ, 5ª Turma, AgRg no HC 965.993/SP, Rel. Min. Maria Marluce Caldas, j. 13.05.2026), evidenciando o caráter relativo do critério estritamente econômico.
+III. DA APLICAÇÃO AO DELITO DE ESTELIONATO (ART. 171 DO CÓDIGO PENAL)
+O Superior Tribunal de Justiça admite a aplicação do princípio da insignificância ao crime de estelionato (art. 171, caput, do CP), inclusive reconhecendo a atipicidade material em casos com prejuízo de até 14,72% do salário-mínimo mesmo em se tratando de agente com reincidência específica, quando as circunstâncias do caso recomendem a medida (STJ, 6ª Turma, AREsp 2.847.740/SC, Rel. Min. Otávio de Almeida Toledo, j. 11.06.2025).
+Outrossim, no estelionato eletrônico (art. 171, § 2º-A, do CP) e no estelionato contra vulneráveis (art. 171, § 4º, do CP), prevalece a diretriz das Cortes Superiores de que eventuais qualificadoras, reincidência ou concurso de pessoas não são óbices intransponíveis e automáticos à incidência da bagatela na ausência de especial censurabilidade, privilegiando-se o Direito Penal do Fato em detrimento do Direito Penal do Autor (STF, HC 188.494 AgR/SP; STF, HC 245.089 AgR/MG; STJ, AgRg no HC 834.558/GO; STJ, AgRg no AREsp 3.181.994/RJ).
+Ressalva-se que a bagatela é inaplicável ao estelionato contra a Administração Pública (art. 171, § 3º, do CP; Súmula 599 do STJ), previdenciário e ao recebimento fraudulento de auxílio emergencial ou seguro-desemprego, admitida exceção apenas em hipóteses de mínimo desvalor da ação e valor ínfimo (STJ, RHC 153.480/CP).
+IV. DO PODER-DEVER DA AUTORIDADE POLICIAL DE CONTROLE DA TIPICIDADE MATERIAL
+A instauração de inquérito policial e a lavratura de auto de prisão em flagrante reclamam suporte empírico idôneo de fato aparentemente típico, ilícito, culpável e punível (justa causa / juízo de possibilidade investigativa - art. 3º-B, IX, do CPP; fundada suspeita - art. 304, § 1º, do CPP).
+A Autoridade Policial, como primeiro agente estatal juridicamente qualificado a analisar os fatos e filtro democrático e garantista do sistema penal (art. 2º da Lei Federal nº 12.830/2013 e art. 26 da Lei Federal nº 14.735/2023 - Lei Orgânica Nacional das Polícias Civis), possui a autonomia e o dever funcional de exercer o controle técnico-jurídico sobre a tipicidade formal e material da conduta (Alexandre Morais da Rosa, Salah Khaled Jr., André Nicolitt, Cleber Masson, Guilherme de Souza Nucci, Guilherme Merolli, Leonardo Marcondes Machado, Nereu Giacomolli).
+A constatação de atipicidade material em sede policial não configura arquivamento de inquérito policial (vedado pelo art. 17 do CPP), mas juízo prévio e fundamentado de não instauração de procedimento ou de não formalização de prisão em flagrante por ausência de justa causa investigativa. Ademais, a Resolução nº 279/2023 do CNMP dispensa comunicação individualizada prévia ao Ministério Público nessas hipóteses, ressalvado o pleno exercício do controle externo ordinário por amostragem e inspeções.
+V. DISPOSITIVO E DETERMINAÇÕES
+Ante o exposto, com fundamento na Nota Técnica nº 007/2026/CAAPJ/ASJUR/DGPC e nos precedentes jurisprudenciais do STF e STJ:
+1. RECONHEÇO A ATIPICIDADE MATERIAL da conduta em razão da incidência do PRINCÍPIO DA INSIGNIFICÂNCIA, ante a manifesta inexpressividade da lesão patrimonial e a ausência de relevância penal da conduta;
+2. Por conseguinte, DEIXO DE INSTAURAR INQUÉRITO POLICIAL / DEIXO DE RATIFICAR OU LAVRAR AUTO DE PRISÃO EM FLAGRANTE por ausência de justa causa investigativa (art. 3º-B, IX, do CPP);
+3. Proceda-se ao registro e baixa do presente Boletim de Ocorrência no sistema policial (SISP), com as devidas anotações no campo de deliberação da Autoridade Policial;
+4. Caso discorde do indeferimento da persecução criminal, poderá interpor recurso administrativo ao Chefe de Polícia, a teor do art. 5º, § 2º, do Código de Processo Penal, ou demandar a reparação civil cabível perante o Juízo Cível competente.`,
   queixa: 'Conforme o principio da Celeridade e informalidade do JEC: Fazer contato com a vitima via aplicativo para alertar a vitima que tera que contratar um advogado para propor no juizado especial a queixa-crime em seis meses. Posteriormente, anexar no SISP, sem tramitacao, a captura de tela para a vitima, ou certidao.',
   jec_incondicionada: 'Conforme o principio da Celeridade e informalidade do JEC: Fazer contato com o AUTOR e informar que: Tem o direito de permanecer calado e se quer exercer esse direito; Pode fazer a gravacao em video ou audio de seu depoimento e enviar via Whatsapp, ou Pode disponibilizar link para o AUTOR prestar declaracao, ou Pode fazer o comparecimento pessoal na Delegacia, Posteriormente anexar no SISP o depoimento, o video or o audio (com sua transcricao) e/ou demais informacoes e tramitar ao cartorio de TC.',
   jec_condicionada: `Conforme o princípio da Celeridade e informalidade do JEC:
@@ -150,6 +196,7 @@ var DETECTION_KEYWORDS = {
   dp_om_atribuicao: ['dp om atribuicao', 'dp com atribuicao', 'dp com atribuição', 'dp om atribuição'],
   decidir_posteriormente: ['decidir posteriormente', 'deseja decidir posteriormente'],
   estelionato: ['estelionato'],
+  estelionato_insignificancia: ['estelionato insignificancia', 'estelionato insignificância', 'estelionato bagatela', 'estelionato - insignificancia', 'estelionato - insignificância', 'estelionato valor inexpressivo'],
   queixa: ['calunia', 'calúnia', 'difamacao', 'difamação', 'injuria', 'injúria', 'exercicio arbitrario das proprias razoes', 'exercício arbitrário das próprias razões', 'dano', 'fraude a execucao', 'fraude à execução', 'alteracao de limites', 'alteração de limites', 'esbulho possessorio', 'esbulho possessório', 'introducao ou abandono de animais em propriedade alheia', 'introdução ou abandono de animais em propriedade alheia'],
   jec_incondicionada: ['vias de fato', 'perturbacao do sossego', 'desobediencia', 'resistencia', 'desacato', 'fuga do local do acidente', 'violacao da suspensao', 'dirigir sem habilitacao', 'entregar veiculo a pessoa nao habilitada', 'trafegar em velocidade incompativel', 'fraude processual no transito'],
   jec_condicionada: ['ameaca', 'ameaça', 'perseguicao', 'outras fraudes', 'omissao de socorro', 'lesao corporal leve', 'lesão corporal leve', 'lesao corporal culposa', 'lesão corporal culposa', 'violacao do segredo profissional', 'violação do segredo profissional', 'invasao de dispositivo informatico', 'invasão de dispositivo informático', 'furto de coisa comum', 'perigo de contagio venereo', 'perigo de contágio venéreo', 'violacao de correspondencia', 'violação de correspondência'],
@@ -170,7 +217,7 @@ var DETECTION_KEYWORDS = {
 
 var DETECTION_PRIORITY = [
   'fato_atipico', 'vitima_nao_representar', 'pericia', 'dp_om_atribuicao',
-  'decidir_posteriormente', 'estelionato', 'queixa',
+  'decidir_posteriormente', 'estelionato_insignificancia', 'estelionato', 'queixa',
   'jec_incondicionada', 'jec_condicionada', 'oitivas_preliminares', 'investigacao',
   'desacordo_comercial', 'fraude', 'estelionato_atribuicao', 'conflito_visitacao', 'devolucao_veiculo', 'cnh_sem_perigo', 'instaurar_ip', 'oitivas_preliminares_testemunha', 'imagens', 'aguardar_outro_elemento', 'rel_invest_sem_autoria'
 ];
@@ -1838,6 +1885,34 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 
   if (msg.type === 'PING') {
     sendResponse({ ok: true, frameType: frameType() });
+    return true;
+  }
+
+  if (msg.type === 'GET_BO_MARKDOWN') {
+    try {
+      var bodyEl = document.body;
+      var rawText = bodyEl ? (bodyEl.innerText || bodyEl.textContent || '') : '';
+      var mdResult = '';
+      if (typeof MarkItDownEngine !== 'undefined') {
+        var engine = new MarkItDownEngine();
+        var rawMd = engine.convert(bodyEl);
+        if (typeof MarkItDownCleaner !== 'undefined') {
+          mdResult = MarkItDownCleaner.sanitize(rawMd, { boNumber: msg.boNumber || '', fato: msg.fato || '' });
+        } else {
+          mdResult = rawMd;
+        }
+      } else {
+        mdResult = rawText;
+      }
+      sendResponse({
+        ok: true,
+        frameType: frameType(),
+        markdown: mdResult,
+        rawText: rawText
+      });
+    } catch(errMd) {
+      sendResponse({ ok: false, error: errMd.message || String(errMd), frameType: frameType() });
+    }
     return true;
   }
 

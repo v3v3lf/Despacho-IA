@@ -10,12 +10,21 @@
 
 ## Como Usar
 
-### Configurar IA Google para análise do BO
+### Configurar Multiprovedor de IA para Análise do BO
 1. Clique no ícone da extensão para abrir o painel
-2. Clique em **"⚙ REGRAS"** e, na seção **"IA Google"**, informe a chave API do Google AI Studio
-3. Informe o modelo Gemini desejado, por exemplo: `gemini-3-flash-preview`
-4. Clique em **"Salvar configuração da IA"**
-5. Ao acionar o passo **③ Analisar**, a extensão gera e exibe uma análise resumida do BO em parágrafo único
+2. Clique em **"⚙ REGRAS"** na seção **"🤖 Multiprovedor de IA"**
+3. Escolha seu provedor favorito entre os 8 suportados:
+   - **Google Gemini** (com suporte a Busca no Google / Grounding) — [Obter chave](https://aistudio.google.com/apikey)
+   - **OpenAI** (GPT-4o, GPT-4o-mini, o3-mini, o1) — [Obter chave](https://platform.openai.com/api-keys)
+   - **Anthropic Claude** (Claude 3.7 Sonnet, 3.5 Sonnet, Haiku) — [Obter chave](https://console.anthropic.com/settings/keys)
+   - **Groq** (LPUs Ultrarrápidas ~800 t/s) — [Obter chave](https://console.groq.com/keys)
+   - **OpenRouter** (Hub Agregador com auto-roteamento) — [Obter chave](https://openrouter.ai/keys)
+   - **Mistral AI** (Mistral Large, Small, Codestral) — [Obter chave](https://console.mistral.ai/api-keys/)
+   - **Cohere** (Linha Command-R para RAG e síntese) — [Obter chave](https://dashboard.cohere.com/api-keys)
+   - **Cerebras** (Velocidade Extrema ~1500 tokens/s) — [Obter chave](https://cloud.cerebras.ai/)
+4. Clique no link direto *"Obter chave no [Provedor] ↗"* para gerar sua API Key em 1 clique
+5. Cole a chave, selecione o modelo desejado e clique em **"💾 Salvar Configurações da IA"**
+6. Ao acionar o passo **③ Analisar**, a extensão gera e exibe uma análise resumida do BO em parágrafo único estruturado.
 
 ### Configurar Regras de Destinatários
 1. Clique no ícone da extensão para abrir o popup

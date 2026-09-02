@@ -17,6 +17,33 @@ O documento que contenha o nome do banco, número da agência(cidade e bairro) d
 Ou documentos para demonstrar o local onde foi efetuada a compra fraudulenta do produto, bairro, cidade e estado em que o autor foi beneficiado com a COMPRA utilizando-se de CARTÃO CLONADO (local da compra no estabelecimento comercial) e juntar o documento comprobatório;
 Ou documentos que contenham o nome do banco, número da agência(cidade e bairro) e conta corrente de onde ocorreu o SAQUE de valor com uso de CARTÃO CLONADO (local onde ocorreu o saque fraudulento);
 Para a vítima informar onde foi o local em que ocorreu a ENTREGA A MERCADORIA (retirada do produto) e juntar o documento comprobatório;`,
+  estelionato_insignificancia: `Vistos,
+Trata-se de notícia-crime registrada mediante Boletim de Ocorrência que noticia, em tese, a suposta prática do delito de estelionato (art. 171 do Código Penal).
+Constata-se dos autos que o prejuízo econômico suportado pela vítima/vantagem ilícita auferida reveste-se de valor inexpressivo, sendo o fato despido de violência física, grave ameaça ou periculosidade social, impondo-se a análise da incidência do princípio da insignificância (crime de bagatela) à luz da Nota Técnica nº 007/2026/CAAPJ/ASJUR/DGPC da Polícia Civil do Estado de Santa Catarina.
+I. DA EXCLUSÃO DA TIPICIDADE MATERIAL PELO PRINCÍPIO DA INSIGNIFICÂNCIA
+Segundo a teoria tripartite do delito, a infração penal compõe-se analiticamente de fato típico, ilícito e culpável, sendo o primeiro substrato constituído por conduta, resultado, nexo causal e tipicidade. A tipicidade compreende as dimensões formal (juízo de subsunção entre o fato e o modelo abstrato da lei) e material (efetiva lesão ou perigo concreto de lesão ao bem jurídico tutelado).
+O princípio da insignificância, como vetor de política criminal (Claus Roxin), opera como causa supralegal de exclusão da tipicidade material por meio de interpretação restritiva do tipo penal, tornando a conduta formalmente típica em irrelevante penal, ante a ausência de lesão ou de perigo relevante de lesão ao bem jurídico albergado diante da inexpressividade do comportamento praticado (STF, HC 104.787/RJ, Rel. Min. Ayres Britto; Carlos Vico Mañas; Eugenio Raúl Zaffaroni; Pierpaolo Cruz Bottini).
+II. DOS REQUISITOS OBJETIVOS E CRITÉRIOS DE INCIDÊNCIA (STF E STJ)
+Conforme fixado pelo Supremo Tribunal Federal (HC 84.412/SP, Rel. Min. Celso de Mello), o reconhecimento da insignificância reclama a presença cumulativa dos seguintes requisitos objetivos:
+a) mínima ofensividade da conduta do agente;
+b) nenhuma periculosidade social da ação;
+c) reduzidíssimo grau de reprovabilidade do comportamento;
+d) inexpressividade da lesão jurídica provocada.
+No plano dos crimes patrimoniais, o Superior Tribunal de Justiça (STJ) adota a diretriz geral de que o valor da res/prejuízo não ultrapasse 10% (dez por cento) do salário-mínimo vigente à época dos fatos (STJ, AgRg no REsp 1.992.226/RS), admitindo-se a flexibilização do parâmetro para patamares em torno de 30% (trinta por cento) do salário-mínimo conforme as peculiaridades do caso concreto (STJ, 5ª Turma, AgRg no HC 965.993/SP, Rel. Min. Maria Marluce Caldas, j. 13.05.2026), evidenciando o caráter relativo do critério estritamente econômico.
+III. DA APLICAÇÃO AO DELITO DE ESTELIONATO (ART. 171 DO CÓDIGO PENAL)
+O Superior Tribunal de Justiça admite a aplicação do princípio da insignificância ao crime de estelionato (art. 171, caput, do CP), inclusive reconhecendo a atipicidade material em casos com prejuízo de até 14,72% do salário-mínimo mesmo em se tratando de agente com reincidência específica, quando as circunstâncias do caso recomendem a medida (STJ, 6ª Turma, AREsp 2.847.740/SC, Rel. Min. Otávio de Almeida Toledo, j. 11.06.2025).
+Outrossim, no estelionato eletrônico (art. 171, § 2º-A, do CP) e no estelionato contra vulneráveis (art. 171, § 4º, do CP), prevalece a diretriz das Cortes Superiores de que eventuais qualificadoras, reincidência ou concurso de pessoas não são óbices intransponíveis e automáticos à incidência da bagatela na ausência de especial censurabilidade, privilegiando-se o Direito Penal do Fato em detrimento do Direito Penal do Autor (STF, HC 188.494 AgR/SP; STF, HC 245.089 AgR/MG; STJ, AgRg no HC 834.558/GO; STJ, AgRg no AREsp 3.181.994/RJ).
+Ressalva-se que a bagatela é inaplicável ao estelionato contra a Administração Pública (art. 171, § 3º, do CP; Súmula 599 do STJ), previdenciário e ao recebimento fraudulento de auxílio emergencial ou seguro-desemprego, admitida exceção apenas em hipóteses de mínimo desvalor da ação e valor ínfimo (STJ, RHC 153.480/CP).
+IV. DO PODER-DEVER DA AUTORIDADE POLICIAL DE CONTROLE DA TIPICIDADE MATERIAL
+A instauração de inquérito policial e a lavratura de auto de prisão em flagrante reclamam suporte empírico idôneo de fato aparentemente típico, ilícito, culpável e punível (justa causa / juízo de possibilidade investigativa - art. 3º-B, IX, do CPP; fundada suspeita - art. 304, § 1º, do CPP).
+A Autoridade Policial, como primeiro agente estatal juridicamente qualificado a analisar os fatos e filtro democrático e garantista do sistema penal (art. 2º da Lei Federal nº 12.830/2013 e art. 26 da Lei Federal nº 14.735/2023 - Lei Orgânica Nacional das Polícias Civis), possui a autonomia e o dever funcional de exercer o controle técnico-jurídico sobre a tipicidade formal e material da conduta (Alexandre Morais da Rosa, Salah Khaled Jr., André Nicolitt, Cleber Masson, Guilherme de Souza Nucci, Guilherme Merolli, Leonardo Marcondes Machado, Nereu Giacomolli).
+A constatação de atipicidade material em sede policial não configura arquivamento de inquérito policial (vedado pelo art. 17 do CPP), mas juízo prévio e fundamentado de não instauração de procedimento ou de não formalização de prisão em flagrante por ausência de justa causa investigativa. Ademais, a Resolução nº 279/2023 do CNMP dispensa comunicação individualizada prévia ao Ministério Público nessas hipóteses, ressalvado o pleno exercício do controle externo ordinário por amostragem e inspeções.
+V. DISPOSITIVO E DETERMINAÇÕES
+Ante o exposto, com fundamento na Nota Técnica nº 007/2026/CAAPJ/ASJUR/DGPC e nos precedentes jurisprudenciais do STF e STJ:
+1. RECONHEÇO A ATIPICIDADE MATERIAL da conduta em razão da incidência do PRINCÍPIO DA INSIGNIFICÂNCIA, ante a manifesta inexpressividade da lesão patrimonial e a ausência de relevância penal da conduta;
+2. Por conseguinte, DEIXO DE INSTAURAR INQUÉRITO POLICIAL / DEIXO DE RATIFICAR OU LAVRAR AUTO DE PRISÃO EM FLAGRANTE por ausência de justa causa investigativa (art. 3º-B, IX, do CPP);
+3. Proceda-se ao registro e baixa do presente Boletim de Ocorrência no sistema policial (SISP), com as devidas anotações no campo de deliberação da Autoridade Policial;
+4. Caso discorde do indeferimento da persecução criminal, poderá interpor recurso administrativo ao Chefe de Polícia, a teor do art. 5º, § 2º, do Código de Processo Penal, ou demandar a reparação civil cabível perante o Juízo Cível competente.`,
   queixa: `Conforme o princípio da Celeridade e informalidade do JEC: Fazer contato com a vítima via aplicativo para alertar a vítima que terá que contratar um advogado para propor no juizado especial a queixa-crime em seis meses. Posteriormente, anexar no SISP, sem tramitação, a captura de tela para a vítima, ou certidão.`,
   jec_incondicionada: `Conforme o princípio da Celeridade e informalidade do JEC: Fazer contato com o AUTOR e informar que: Tem o direito de permanecer calado e se quer exercer esse direito; Pode fazer a gravação em vídeo ou audio de seu depoimento e enviar via Whatsapp, ou Pode disponibilizar link para o AUTOR prestar declaração, ou Pode fazer o comparecimento pessoal na Delegacia, Posteriormente anexar no SISP o depoimento, o vídeo ou o áudio (com sua transcrição) e/ou demais informações e tramitar ao cartório de TC.`,
   jec_condicionada: `Conforme o princípio da Celeridade e informalidade do JEC:
@@ -64,6 +91,7 @@ const TIPO_LABELS = {
   decidir_posteriormente: 'Decidir Posterior.',
   investigacao: 'Investigação',
   estelionato: 'Estelionato',
+  estelionato_insignificancia: 'Estelionato - Insignificância',
   queixa: 'Queixa',
   jec_incondicionada: 'JEC-incond.',
   jec_condicionada: 'JEC-cond.',
@@ -89,6 +117,7 @@ const FATO_OPTIONS = [
   { value: 'decidir_posteriormente', label: 'DECIDIR POSTERIORMENTE' },
   { value: 'investigacao', label: 'INVESTIGAÇÃO' },
   { value: 'estelionato', label: 'ESTELIONATO' },
+  { value: 'estelionato_insignificancia', label: 'ESTELIONATO - INSIGNIFICÂNCIA' },
   { value: 'queixa', label: 'QUEIXA' },
   { value: 'jec_incondicionada', label: 'JEC-INCONDICIONADA' },
   { value: 'jec_condicionada', label: 'JEC-CONDICIONADA' },
@@ -129,8 +158,18 @@ let currentResumoIA = null;
 let currentRelatoText = '';
 let currentFatos = '';
 let isAutoMode = false;
-let googleApiKey = '';
-let geminiModel = DEFAULT_GEMINI_MODEL;
+
+// Estado Multiprovedor de IA
+let activeProvider = 'gemini';
+let providerKeys = {};
+let providerModels = {};
+let enableWebSearch = false;
+
+// Estado MarkItDown
+let currentMarkdownDoc = '';
+let currentRawDoc = '';
+let currentTokenStats = null;
+let currentActiveMdTab = 'rendered';
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
@@ -143,35 +182,144 @@ function escapeHtml(value) {
     .replace(/'/g, '&#039;');
 }
 
-function loadAiConfigUI() {
-  const keyInput = document.getElementById('googleApiKeyInput');
-  const modelInput = document.getElementById('geminiModelInput');
-  const status = document.getElementById('aiConfigStatus');
-  if (keyInput) keyInput.value = googleApiKey;
-  if (modelInput) {
-    const val = geminiModel || DEFAULT_GEMINI_MODEL;
-    // Se o valor salvo não estiver nas opções do select, cria uma option temporária para ele
-    if (modelInput.options && !Array.from(modelInput.options).some(opt => opt.value === val)) {
-      const newOpt = document.createElement('option');
-      newOpt.value = val;
-      newOpt.textContent = val + ' (Personalizado)';
-      modelInput.appendChild(newOpt);
-    }
-    modelInput.value = val;
-  }
-  if (status && googleApiKey) {
-    status.textContent = 'Configuração da IA salva. O resumo será gerado no passo ③ Analisar.';
-    status.className = 'success';
-  }
+/**
+ * Atualiza o badge do provedor e modelo ativos no cabeçalho.
+ */
+function updateActiveAiBadge() {
+  const badge = document.getElementById('activeAiBadge');
+  if (!badge) return;
+  const cfg = (typeof getProviderConfig === 'function') ? getProviderConfig(activeProvider) : null;
+  const icon = cfg?.icon || '🤖';
+  const name = cfg?.badgeText || cfg?.name || 'IA';
+  const currentModel = providerModels[activeProvider] || cfg?.defaultModel || '';
+  
+  let shortModel = currentModel
+    .replace(/^models\//, '')
+    .replace(/^openrouter\//, '')
+    .replace(/^meta-llama\//, '')
+    .replace(/^google\//, '')
+    .replace(/^anthropic\//, '');
+  if (shortModel.length > 20) shortModel = shortModel.substring(0, 18) + '...';
+
+  const searchIcon = enableWebSearch && cfg?.supportsGrounding ? ' 🌐' : '';
+  badge.textContent = `${icon} ${shortModel || name}${searchIcon}`;
+  badge.title = `Provedor: ${cfg?.name || activeProvider}\nModelo: ${currentModel}\nBusca na Web: ${enableWebSearch ? 'Ativa' : 'Desativada'}`;
 }
 
-function getAiConfigFromUI() {
-  const keyInput = document.getElementById('googleApiKeyInput');
-  const modelInput = document.getElementById('geminiModelInput');
-  return {
-    googleApiKey: keyInput ? keyInput.value.trim() : (googleApiKey || ''),
-    geminiModel: (modelInput ? modelInput.value : (geminiModel || DEFAULT_GEMINI_MODEL))
-  };
+/**
+ * Sincroniza toda a interface do modal/painel de IA com o provedor e chaves ativos.
+ */
+function loadAiConfigUI() {
+  const providerSelect = document.getElementById('providerSelect');
+  const providerLabel = document.getElementById('currentProviderLabel');
+  const keyHelpLink = document.getElementById('providerKeyHelpLink');
+  const keyInput = document.getElementById('providerApiKeyInput');
+  const keyStatusBadge = document.getElementById('keyStatusBadge');
+  const modelSelect = document.getElementById('providerModelSelect');
+  const toggleSearch = document.getElementById('toggleWebSearch');
+  const searchSupportBadge = document.getElementById('webSearchSupportBadge');
+  const searchDesc = document.getElementById('webSearchDesc');
+  const statusEl = document.getElementById('aiConfigStatus');
+
+  const providerConfig = (typeof getProviderConfig === 'function')
+    ? getProviderConfig(activeProvider)
+    : { name: 'Google Gemini', icon: '🌐', apiKeyUrl: 'https://aistudio.google.com/apikey', defaultModel: 'gemini-2.5-flash', modelGroups: [] };
+
+  if (providerSelect) {
+    providerSelect.value = activeProvider;
+  }
+
+  if (providerLabel) {
+    providerLabel.textContent = providerConfig.name;
+  }
+
+  if (keyHelpLink) {
+    keyHelpLink.href = providerConfig.apiKeyUrl;
+    keyHelpLink.textContent = `Obter chave no ${providerConfig.name} ↗`;
+  }
+
+  const currentKey = providerKeys[activeProvider] || '';
+  if (keyInput) {
+    keyInput.value = currentKey;
+    keyInput.placeholder = providerConfig.keyPlaceholder || 'Cole sua chave de API...';
+  }
+
+  if (keyStatusBadge) {
+    if (currentKey && currentKey.trim().length > 0) {
+      keyStatusBadge.textContent = 'Salva ✓';
+      keyStatusBadge.className = 'key-status-badge saved';
+    } else {
+      keyStatusBadge.textContent = 'Não salva';
+      keyStatusBadge.className = 'key-status-badge missing';
+    }
+  }
+
+  if (modelSelect) {
+    modelSelect.innerHTML = '';
+    const selectedModel = providerModels[activeProvider] || providerConfig.defaultModel;
+
+    let modelFound = false;
+    if (providerConfig.modelGroups && providerConfig.modelGroups.length > 0) {
+      providerConfig.modelGroups.forEach(group => {
+        const optGroup = document.createElement('optgroup');
+        optGroup.label = group.label;
+        group.models.forEach(m => {
+          const opt = document.createElement('option');
+          opt.value = m.id;
+          opt.textContent = m.name;
+          if (m.id === selectedModel) {
+            opt.selected = true;
+            modelFound = true;
+          }
+          optGroup.appendChild(opt);
+        });
+        modelSelect.appendChild(optGroup);
+      });
+    }
+
+    if (!modelFound && selectedModel) {
+      const customOpt = document.createElement('option');
+      customOpt.value = selectedModel;
+      customOpt.textContent = `${selectedModel} (Personalizado)`;
+      customOpt.selected = true;
+      modelSelect.appendChild(customOpt);
+    }
+  }
+
+  if (toggleSearch) {
+    toggleSearch.checked = !!enableWebSearch;
+    if (!providerConfig.supportsGrounding) {
+      toggleSearch.disabled = true;
+      if (searchSupportBadge) {
+        searchSupportBadge.textContent = 'Não aplicável';
+        searchSupportBadge.className = 'web-search-badge disabled';
+      }
+      if (searchDesc) {
+        searchDesc.textContent = `O provedor ${providerConfig.name} não possui suporte nativo a pesquisa Google em tempo real.`;
+      }
+    } else {
+      toggleSearch.disabled = false;
+      if (searchSupportBadge) {
+        searchSupportBadge.textContent = 'Suportado';
+        searchSupportBadge.className = 'web-search-badge';
+      }
+      if (searchDesc) {
+        searchDesc.textContent = 'Habilita pesquisa no Google em tempo real para enriquecer a fundamentação jurídica.';
+      }
+    }
+  }
+
+  if (statusEl) {
+    if (currentKey) {
+      statusEl.textContent = `Provedor ativo: ${providerConfig.name} (${providerModels[activeProvider] || providerConfig.defaultModel})`;
+      statusEl.className = 'success';
+    } else {
+      statusEl.textContent = `Informe a chave de API do ${providerConfig.name} para utilizar a análise inteligente.`;
+      statusEl.className = 'error';
+    }
+  }
+
+  updateActiveAiBadge();
 }
 
 let _renderCount = 0;
@@ -191,10 +339,7 @@ function renderAnalysisBox(fatos, resumo, state, message) {
   const copyBtn = document.getElementById('btnCopyResumo');
   if (copyBtn) {
     if (resumo) {
-      // Exibe o botão ao lado do 3.1
       copyBtn.style.display = 'inline-flex';
-      
-      // Remove event listeners antigos clonando o botão para evitar duplicações
       const newCopyBtn = copyBtn.cloneNode(true);
       copyBtn.parentNode.replaceChild(newCopyBtn, copyBtn);
       
@@ -216,188 +361,273 @@ function renderAnalysisBox(fatos, resumo, state, message) {
           });
       });
     } else {
-      // Esconde o botão se não houver resumo
       copyBtn.style.display = 'none';
     }
   }
 }
 
-function isRetryableGeminiError(status, message) {
-  return status === 429 || status === 500 || status === 502 || status === 503 || status === 504 ||
-    /internal|temporarily|unavailable|overloaded|timeout|rate/i.test(message || '');
-}
+/**
+ * Atualiza a interface e métricas do visualizador MarkItDown.
+ */
+function updateMarkItDownUI(markdownText, rawText, metadata = {}) {
+  currentMarkdownDoc = (markdownText || '').trim();
+  currentRawDoc = (rawText || '').trim();
 
-async function callGeminiGenerate(model, apiKey, prompt, systemInstruction = '') {
-  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
-  
-  const bodyPayload = {
-    contents: [{ role: 'user', parts: [{ text: prompt }] }],
-    generationConfig: { temperature: 0.1, maxOutputTokens: 1000 },
-    safetySettings: [
-      { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
-      { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },
-      { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
-      { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' }
-    ]
-  };
+  const tokenBadge = document.getElementById('mdTokenBadge');
+  const renderedView = document.getElementById('mdRenderedView');
+  const rawTextarea = document.getElementById('mdRawTextarea');
+  const statsContainer = document.getElementById('mdStatsContainer');
 
-  if (systemInstruction) {
-    bodyPayload.systemInstruction = {
-      parts: [{ text: systemInstruction }]
+  if (typeof MarkItDownCleaner !== 'undefined' && currentRawDoc) {
+    currentTokenStats = MarkItDownCleaner.computeTokenStats(currentRawDoc, currentMarkdownDoc);
+  } else {
+    const mdChars = currentMarkdownDoc.length;
+    const rawChars = currentRawDoc.length || mdChars;
+    const mdTok = Math.ceil(mdChars / 3.8);
+    const rawTok = Math.ceil(rawChars / 3.8);
+    currentTokenStats = {
+      originalChars: rawChars,
+      markdownChars: mdChars,
+      originalTokens: rawTok,
+      markdownTokens: mdTok,
+      savedTokens: Math.max(0, rawTok - mdTok),
+      savedPercent: rawChars > 0 ? Math.max(0, Math.round(((rawChars - mdChars) / rawChars) * 100)) : 0
     };
   }
 
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(bodyPayload)
-  });
-
-  const data = await response.json().catch(() => ({}));
-  console.log('[Despacho IA] Dados brutos da resposta do Gemini:', JSON.stringify(data));
-  
-  if (!response.ok) {
-    const message = data && data.error && data.error.message ? data.error.message : `HTTP ${response.status}`;
-    const err = new Error(message);
-    err.status = response.status;
-    err.retryable = isRetryableGeminiError(response.status, message);
-    throw err;
+  // Atualiza Badge de Economia
+  if (tokenBadge) {
+    if (currentTokenStats && currentTokenStats.savedPercent > 0) {
+      tokenBadge.textContent = `⚡ MarkItDown: -${currentTokenStats.savedPercent}% tokens`;
+      tokenBadge.classList.remove('hidden');
+    } else if (currentMarkdownDoc) {
+      tokenBadge.textContent = `⚡ MarkItDown Ativo`;
+      tokenBadge.classList.remove('hidden');
+    } else {
+      tokenBadge.classList.add('hidden');
+    }
   }
 
-  const candidate = (data.candidates || [])[0] || {};
-  if (candidate.finishReason && candidate.finishReason !== 'STOP') {
-    console.warn('[Despacho IA] Aviso: finishReason não é STOP:', candidate.finishReason);
+  // Renderiza HTML
+  if (renderedView) {
+    if (typeof MarkItDownViewer !== 'undefined') {
+      renderedView.innerHTML = MarkItDownViewer.renderToHtml(currentMarkdownDoc);
+    } else {
+      renderedView.textContent = currentMarkdownDoc;
+    }
   }
 
-  let text = (candidate.content || {}).parts
-    ? candidate.content.parts.map(p => p.text || '').join('\n').trim()
-    : '';
-
-  // 1. Remove blocos de raciocínio da IA (ex: <think>...</think>)
-  text = text.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
-
-  // 2. Tenta extrair o conteúdo após a tag "RESUMO:" (independente de maiúsculas/minúsculas)
-  const resumoMatch = text.match(/RESUMO:?\s*([\s\S]+)/i);
-  if (resumoMatch) {
-    text = resumoMatch[1].trim();
+  // Textarea Raw
+  if (rawTextarea) {
+    rawTextarea.value = currentMarkdownDoc;
   }
 
-  // 3. Remove prefixos redundantes que a IA costuma adicionar mesmo quando não pedimos
-  text = text.replace(/^(Resumo do Relato Individual|Resumo do BO|Resumo):?\s*/i, '').trim();
-
-  if (!text) throw new Error('A API não retornou texto para a análise.');
-  return text;
+  // Grid de Estatísticas
+  if (statsContainer && currentTokenStats) {
+    statsContainer.innerHTML = `
+      <div class="md-stat-card">
+        <div class="md-stat-val highlight">${currentTokenStats.markdownTokens.toLocaleString('pt-BR')}</div>
+        <div class="md-stat-lbl">Tokens (.md)</div>
+      </div>
+      <div class="md-stat-card">
+        <div class="md-stat-val">${currentTokenStats.originalTokens.toLocaleString('pt-BR')}</div>
+        <div class="md-stat-lbl">Tokens (Bruto)</div>
+      </div>
+      <div class="md-stat-card">
+        <div class="md-stat-val highlight">${currentTokenStats.markdownChars.toLocaleString('pt-BR')}</div>
+        <div class="md-stat-lbl">Caracteres (.md)</div>
+      </div>
+      <div class="md-stat-card">
+        <div class="md-stat-val highlight">-${currentTokenStats.savedPercent}%</div>
+        <div class="md-stat-lbl">Economia Total</div>
+      </div>
+    `;
+  }
 }
 
-async function gerarResumoRelatoIA(textoBo, fatos) {
-  const cfg = getAiConfigFromUI();
-  googleApiKey = cfg.googleApiKey;
-  geminiModel = cfg.geminiModel;
+/**
+ * Inicializa os ouvintes de eventos da UI do MarkItDown (abas, drawer e botões).
+ */
+function initMarkItDownUI() {
+  const btnToggle = document.getElementById('btnToggleMdView');
+  const drawer = document.getElementById('mdDrawer');
+  const btnClose = document.getElementById('btnCloseMdDrawer');
+  const tabRendered = document.getElementById('tabMdRendered');
+  const tabRaw = document.getElementById('tabMdRaw');
+  const tabStats = document.getElementById('tabMdStats');
+  const renderedView = document.getElementById('mdRenderedView');
+  const rawView = document.getElementById('mdRawView');
+  const statsView = document.getElementById('mdStatsView');
+  const btnCopy = document.getElementById('btnCopyMd');
+  const btnDownload = document.getElementById('btnDownloadMd');
+  const btnSaveEdited = document.getElementById('btnSaveEditedMd');
+  const rawTextarea = document.getElementById('mdRawTextarea');
 
-  if (!googleApiKey) {
-    return { ok: false, skipped: true, message: 'Configure a chave API Google acima para gerar a análise automaticamente.' };
+  if (btnToggle && drawer) {
+    btnToggle.addEventListener('click', () => {
+      drawer.classList.toggle('hidden');
+      if (!drawer.classList.contains('hidden') && !currentMarkdownDoc && currentRelatoText) {
+        // Converte texto em markdown se ainda não foi convertido
+        let md = currentRelatoText;
+        if (typeof MarkItDownEngine !== 'undefined') {
+          const engine = new MarkItDownEngine();
+          md = engine.convert(currentRelatoText);
+        }
+        if (typeof MarkItDownCleaner !== 'undefined') {
+          md = MarkItDownCleaner.sanitize(md, { fato: currentFatos });
+        }
+        updateMarkItDownUI(md, currentRelatoText);
+      }
+    });
   }
 
-  let textoRelato = (textoBo || '').trim();
-  if (!textoRelato || textoRelato.length < 20) {
-    return { ok: false, skipped: true, message: 'Nenhum texto encontrado na página do BO para análise IA.' };
+  if (btnClose && drawer) {
+    btnClose.addEventListener('click', () => {
+      drawer.classList.add('hidden');
+    });
   }
 
-  // Mantemos o texto completo do BO para que a IA consiga extrair o número do BO, endereço, envolvidos, etc.
-  addLog('Enviando ' + textoRelato.length + ' caracteres do BO para a API Gemini (Início: "' + textoRelato.substring(0, 50).replace(/\n/g, ' ') + '...")', 'info');
-  console.log('[Despacho IA] Texto completo do BO enviado para a API (' + textoRelato.length + ' chars)');
+  function setMdTab(tabName) {
+    currentActiveMdTab = tabName;
+    if (tabRendered) tabRendered.classList.toggle('active', tabName === 'rendered');
+    if (tabRaw) tabRaw.classList.toggle('active', tabName === 'raw');
+    if (tabStats) tabStats.classList.toggle('active', tabName === 'stats');
 
-  const configuredModel = geminiModel.replace(/^models\//, '') || DEFAULT_GEMINI_MODEL;
-  const modelsToTry = [configuredModel];
-  if (configuredModel !== DEFAULT_GEMINI_MODEL) modelsToTry.push(DEFAULT_GEMINI_MODEL);
+    if (renderedView) renderedView.classList.toggle('hidden', tabName !== 'rendered');
+    if (rawView) rawView.classList.toggle('hidden', tabName !== 'raw');
+    if (statsView) statsView.classList.toggle('hidden', tabName !== 'stats');
+  }
 
-  const systemInstruction = `Você é um analista de dados policiais especialista em extrair dados estruturados de Boletins de Ocorrência.
-Sua tarefa é ler todo o texto do Boletim de Ocorrência fornecido e criar um resumo fluido, contínuo e em parágrafo único.
+  if (tabRendered) tabRendered.addEventListener('click', () => setMdTab('rendered'));
+  if (tabRaw) tabRaw.addEventListener('click', () => setMdTab('raw'));
+  if (tabStats) tabStats.addEventListener('click', () => setMdTab('stats'));
+
+  if (btnCopy) {
+    btnCopy.addEventListener('click', () => {
+      const textToCopy = currentMarkdownDoc || (rawTextarea ? rawTextarea.value : '');
+      if (!textToCopy) return;
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        const orig = btnCopy.innerHTML;
+        btnCopy.innerHTML = '✓ Copiado!';
+        setTimeout(() => { btnCopy.innerHTML = orig; }, 1800);
+      }).catch(err => {
+        console.error('[Despacho IA] Erro ao copiar MD:', err);
+      });
+    });
+  }
+
+  if (btnDownload) {
+    btnDownload.addEventListener('click', () => {
+      const content = currentMarkdownDoc || (rawTextarea ? rawTextarea.value : '');
+      if (!content) return;
+      const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `BO_${currentTipo || 'documento'}.md`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+  }
+
+  if (btnSaveEdited && rawTextarea) {
+    btnSaveEdited.addEventListener('click', async () => {
+      const editedMd = rawTextarea.value.trim();
+      if (!editedMd) return;
+      currentMarkdownDoc = editedMd;
+      updateMarkItDownUI(currentMarkdownDoc, currentRawDoc);
+      setMdTab('rendered');
+      addLog('Markdown atualizado manualmente. Reexecutando análise com IA...', 'info');
+      try {
+        renderAnalysisBox(currentFatos, null, '', '⟳ Reanalisando com Markdown personalizado...');
+        const resumoRes = await gerarResumoRelatoIA(currentMarkdownDoc, currentFatos);
+        if (resumoRes.ok) {
+          currentResumoIA = resumoRes.resumo;
+          renderAnalysisBox(currentFatos, currentResumoIA);
+          addLog('Resumo IA gerado com sucesso via Markdown personalizado', 'success');
+        } else {
+          renderAnalysisBox(currentFatos, null, 'error', resumoRes.message);
+        }
+      } catch (err) {
+        renderAnalysisBox(currentFatos, null, 'error', err.message);
+      }
+    });
+  }
+}
+
+/**
+ * Função principal para gerar o resumo do BO usando o Provedor de IA ativo e MarkItDown.
+ */
+async function gerarResumoRelatoIA(documentoMarkdownOuTexto, fatos) {
+  const currentKey = providerKeys[activeProvider] || '';
+  const providerConfig = (typeof getProviderConfig === 'function')
+    ? getProviderConfig(activeProvider)
+    : { name: 'Google Gemini', defaultModel: 'gemini-2.5-flash', apiKeyUrl: 'https://aistudio.google.com/apikey' };
+
+  if (!currentKey || !currentKey.trim()) {
+    return {
+      ok: false,
+      skipped: true,
+      message: `Configure a chave de API do ${providerConfig.name} em ⚙ REGRAS para gerar a análise automaticamente.`
+    };
+  }
+
+  let textoDoc = (documentoMarkdownOuTexto || '').trim();
+  if (!textoDoc || textoDoc.length < 20) {
+    return { ok: false, skipped: true, message: 'Nenhum texto estruturado encontrado na página do BO para análise IA.' };
+  }
+
+  const currentModel = providerModels[activeProvider] || providerConfig.defaultModel;
+
+  addLog(`Enviando documento MarkItDown (${textoDoc.length} chars) para ${providerConfig.name} (${currentModel})...`, 'info');
+  console.log(`[Despacho IA] Enviando para ${providerConfig.name} [${currentModel}] (${textoDoc.length} chars MarkItDown)`);
+
+  const systemInstruction = `Você é um analista de dados policiais especialista em extrair dados estruturados de Boletins de Ocorrência do SISP.
+Sua tarefa é ler todo o documento do Boletim de Ocorrência estruturado em Markdown fornecido e criar um resumo fluido, contínuo e em parágrafo único.
 
 Instruções específicas:
 1. Inicie obrigatoriamente com o padrão: "o BO-[NÚMERO DO BO]" (ex: "o BO-00614.2026.0030318"). Utilize o número do BO no formato de registro (ex: "00127.2026.0001088").
-2. No mesmo parágrafo, de forma corrida (sem quebras de linha ou divisões), informe: os fatos comunicados, a data/horário, o endereço do ocorrido, o comunicante, a(s) vítima(s) e o autor do crime (caso identificado).
-3. Inclua a dinâmica do fato de forma detalhada, especificando todas as ações relatadas e todos os objetos/bens subtraídos (como botijões de gás, ferramentas, celular, etc.).
-4. Nunca invente ou assuma informações não descritas explicitamente no texto fornecido.
+2. No mesmo parágrafo, de forma corrida (sem quebras de linha ou divisões), informe: os fatos comunicados, a data/horário, o endereço do ocorrido, o comunicante, a(s) vítima(s) e o autor do crime (caso identificado nas tabelas ou relato).
+3. Inclua a dinâmica do fato de forma detalhada, especificando todas as ações relatadas e todos os objetos/bens/valores subtraídos ou transacionados descritos no Markdown.
+4. Nunca invente ou assuma informações não descritas explicitamente no documento estruturado fornecido.
 5. Se autor ou testemunhas não forem citados ou forem declarados como desconhecidos, simplesmente não os mencione no texto.
 6. ATENÇÃO: O resumo deve ser concluído com um ponto final e conter todo o relato estruturado, sem ser cortado ou truncado no meio de uma frase.`;
 
-  function buildPrompt(limit) {
-    return `Texto extraído do Boletim de Ocorrência:
+  const prompt = `### BOLETIM DE OCORRÊNCIA ESTRUTURADO (MARKDOWN):
 ---
-${textoRelato.slice(0, limit)}
+${textoDoc.slice(0, 16000)}
 ---`;
-  }
 
-  let lastError = null;
-  let triedModels = new Set();
-  for (let m = 0; m < modelsToTry.length; m++) {
-    const model = modelsToTry[m];
-    triedModels.add(model);
-
-    // Primeira rodada com contexto maior; se a API retornar erro interno, tenta com contexto menor.
-    for (const limit of [12000, 6000]) {
-      const prompt = buildPrompt(limit);
-
-      for (let attempt = 1; attempt <= 3; attempt++) {
-        try {
-          const resumo = await callGeminiGenerate(model, googleApiKey, prompt, systemInstruction);
-          if (attempt > 1 || limit < 12000 || model !== configuredModel) {
-            addLog(`Análise IA gerada após nova tentativa (modelo ${model})`, 'success');
-          }
-          return { ok: true, resumo };
-        } catch (e) {
-          lastError = e;
-          const retryable = e.retryable || isRetryableGeminiError(e.status, e.message);
-          if (!retryable) break;
-          addLog(`API Gemini instável (${e.message}). Tentativa ${attempt}/3...`, 'warning');
-          await sleep(700 * attempt);
-        }
+  try {
+    const result = await callAIProvider({
+      provider: activeProvider,
+      model: currentModel,
+      apiKey: currentKey,
+      prompt: prompt,
+      systemInstruction: systemInstruction,
+      enableWebSearch: enableWebSearch,
+      temperature: 0.1,
+      maxTokens: 1400,
+      onRetry: (attempt, maxAttempts, delay, err) => {
+        addLog(`API ${providerConfig.name} instável (${err.message}). Tentativa ${attempt}/${maxAttempts}...`, 'warning');
       }
-      if (lastError && !lastError.retryable && lastError.status !== 404) break;
-    }
+    });
 
-    // Auto-discover if 404 and we've exhausted our options
-    if (lastError && lastError.status === 404 && m === modelsToTry.length - 1) {
-      try {
-        addLog('Modelo não encontrado. Buscando modelos disponíveis...', 'info');
-        const mResp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(googleApiKey)}`);
-        const mData = await mResp.json();
-        if (mData && mData.models) {
-          const valid = mData.models
-            .filter(x => x.supportedGenerationMethods && x.supportedGenerationMethods.includes('generateContent'))
-            .map(x => x.name.replace('models/', ''));
-          
-          if (valid.length > 0) {
-            const bestModel = valid.find(x => x.includes('flash') && !x.includes('lite')) || 
-                              valid.find(x => x.includes('gemini')) || 
-                              valid[0];
-            
-            if (bestModel && !triedModels.has(bestModel)) {
-              addLog(`Encontrado: ${bestModel}. Tentando novamente...`, 'info');
-              modelsToTry.push(bestModel);
-              chrome.storage.local.set({ geminiModel: bestModel });
-              geminiModel = bestModel;
-            } else {
-              lastError = new Error(`Modelos disponíveis: ${valid.join(', ')}`);
-            }
-          }
-        }
-      } catch (err) {
-        if (err.message.includes('Modelos disponíveis')) lastError = err;
-      }
-    }
+    return { ok: true, resumo: result.text };
+  } catch (err) {
+    const msg = err.formattedMessage || err.message || 'Erro de comunicação com a IA.';
+    throw new Error(msg);
   }
-
-  const msg = lastError && lastError.message ? lastError.message : 'erro desconhecido';
-  throw new Error(`API Google instável ou indisponível (${msg}). Tente novamente ou altere o modelo em ⚙ REGRAS.`);
 }
 
 async function initApp() {
   console.log('[Despacho IA] Inicializando App...');
   
-  // 1. Carrega dados de IA que não dependem de sessão
+  // 1. Carrega dados de IA que não dependem de sessão e UI do MarkItDown
   loadAiConfigUI();
+  initMarkItDownUI();
 
   // 2. Resetar estado do fluxo
   currentTipo = null;
@@ -440,20 +670,35 @@ async function initApp() {
   document.querySelector('.bottom-nav').style.display = 'flex';
   document.getElementById('btnLogout').style.display = 'block';
 
-  // 4. Carrega configurações e regras locais
-  chrome.storage.local.get(['rules', 'logs', 'googleApiKey', 'geminiModel'], data => {
+  // 4. Carrega configurações, migra chaves legadas e renderiza regras/logs
+  chrome.storage.local.get([
+    'rules',
+    'logs',
+    'googleApiKey',
+    'geminiModel',
+    'activeProvider',
+    'providerKeys',
+    'providerModels',
+    'enableWebSearch'
+  ], data => {
     // Garante que rules e logs sejam sempre arrays
     rules = Array.isArray(data.rules) ? data.rules : [];
     logs = Array.isArray(data.logs) ? data.logs : [];
-    
-    if (data.googleApiKey) googleApiKey = data.googleApiKey;
-    if (data.geminiModel) {
-      if (data.geminiModel === 'gemini-3-flash' || data.geminiModel === 'gemini-3.1-flash-lite' || data.geminiModel === 'gemini-2.0-flash' || data.geminiModel === 'gemini-1.5-flash') {
-        geminiModel = 'gemini-1.5-flash-002';
-        chrome.storage.local.set({ geminiModel: 'gemini-1.5-flash-002' });
-      } else {
-        geminiModel = data.geminiModel;
-      }
+
+    // Migração e carregamento transparente de Multiprovedores
+    activeProvider = data.activeProvider || 'gemini';
+    providerKeys = (data.providerKeys && typeof data.providerKeys === 'object') ? data.providerKeys : {};
+    providerModels = (data.providerModels && typeof data.providerModels === 'object') ? data.providerModels : {};
+    if (typeof data.enableWebSearch === 'boolean') {
+      enableWebSearch = data.enableWebSearch;
+    }
+
+    // Migração de chaves legadas do Gemini se ainda não existirem no novo formato
+    if (data.googleApiKey && !providerKeys.gemini) {
+      providerKeys.gemini = data.googleApiKey;
+    }
+    if (data.geminiModel && !providerModels.gemini) {
+      providerModels.gemini = data.geminiModel;
     }
 
     try {
@@ -671,21 +916,93 @@ function onStepDone(step) {
   }
 }
 
-// CONFIG IA
-if (document.getElementById('btnSaveAiConfig')) {
-  document.getElementById('btnSaveAiConfig').addEventListener('click', () => {
-    const cfg = getAiConfigFromUI();
-    googleApiKey = cfg.googleApiKey;
-    geminiModel = cfg.geminiModel;
-    chrome.storage.local.set({ googleApiKey, geminiModel }, () => {
-      const status = document.getElementById('aiConfigStatus');
-      if (status) {
-        status.textContent = googleApiKey
-          ? `Configuração salva. Modelo: ${geminiModel}`
-          : 'Modelo salvo, mas informe a chave API Google para usar o resumo por IA.';
-        status.className = googleApiKey ? 'success' : 'error';
+// CONFIG MULTIPROVEDOR IA
+const providerSelectEl = document.getElementById('providerSelect');
+if (providerSelectEl) {
+  providerSelectEl.addEventListener('change', (e) => {
+    activeProvider = e.target.value;
+    chrome.storage.local.set({ activeProvider });
+    loadAiConfigUI();
+    const cfg = (typeof getProviderConfig === 'function') ? getProviderConfig(activeProvider) : { name: activeProvider };
+    addLog(`Provedor de IA alterado para: ${cfg.name}`, 'info');
+  });
+}
+
+const btnToggleKeyEye = document.getElementById('btnToggleKeyEye');
+if (btnToggleKeyEye) {
+  btnToggleKeyEye.addEventListener('click', () => {
+    const keyInput = document.getElementById('providerApiKeyInput');
+    if (!keyInput) return;
+    if (keyInput.type === 'password') {
+      keyInput.type = 'text';
+      btnToggleKeyEye.textContent = '🔒';
+      btnToggleKeyEye.title = 'Ocultar chave';
+    } else {
+      keyInput.type = 'password';
+      btnToggleKeyEye.textContent = '👁️';
+      btnToggleKeyEye.title = 'Mostrar chave';
+    }
+  });
+}
+
+const providerModelSelectEl = document.getElementById('providerModelSelect');
+if (providerModelSelectEl) {
+  providerModelSelectEl.addEventListener('change', (e) => {
+    providerModels[activeProvider] = e.target.value;
+    chrome.storage.local.set({ providerModels });
+    if (activeProvider === 'gemini') {
+      chrome.storage.local.set({ geminiModel: e.target.value });
+    }
+    updateActiveAiBadge();
+  });
+}
+
+const toggleWebSearchEl = document.getElementById('toggleWebSearch');
+if (toggleWebSearchEl) {
+  toggleWebSearchEl.addEventListener('change', (e) => {
+    enableWebSearch = e.target.checked;
+    chrome.storage.local.set({ enableWebSearch });
+    updateActiveAiBadge();
+    addLog(`Busca na Internet (Grounding): ${enableWebSearch ? 'Ativada' : 'Desativada'}`, 'info');
+  });
+}
+
+const btnSaveAiConfigEl = document.getElementById('btnSaveAiConfig');
+if (btnSaveAiConfigEl) {
+  btnSaveAiConfigEl.addEventListener('click', () => {
+    const keyInput = document.getElementById('providerApiKeyInput');
+    const modelSelect = document.getElementById('providerModelSelect');
+    const toggleSearch = document.getElementById('toggleWebSearch');
+
+    const keyVal = keyInput ? keyInput.value.trim() : '';
+    const modelVal = modelSelect ? modelSelect.value : '';
+    const searchVal = toggleSearch ? toggleSearch.checked : false;
+
+    providerKeys[activeProvider] = keyVal;
+    if (modelVal) providerModels[activeProvider] = modelVal;
+    enableWebSearch = searchVal;
+
+    const dataToSave = {
+      activeProvider,
+      providerKeys,
+      providerModels,
+      enableWebSearch
+    };
+
+    // Retrocompatibilidade se Gemini ativo
+    if (activeProvider === 'gemini') {
+      dataToSave.googleApiKey = keyVal;
+      dataToSave.geminiModel = modelVal;
+    }
+
+    chrome.storage.local.set(dataToSave, () => {
+      loadAiConfigUI();
+      const cfg = (typeof getProviderConfig === 'function') ? getProviderConfig(activeProvider) : { name: activeProvider };
+      if (keyVal) {
+        addLog(`Configurações de IA salvas com sucesso para ${cfg.name}!`, 'success');
+      } else {
+        addLog(`Chave não configurada para ${cfg.name}. Insira sua chave para habilitar a análise.`, 'warning');
       }
-      addLog('Configuração da IA salva', googleApiKey ? 'success' : 'warning');
     });
   });
 }
@@ -835,42 +1152,82 @@ async function triggerStep3_1() {
   }
 
   showSection('secResumoIA');
-  renderAnalysisBox(currentFatos, null, '', '⟳ Gerando resumo com IA...');
-  setStatus('Gerando resumo com IA...', 'active');
-  addLog('Extraindo textos de todas as seções do BO...', 'info');
+  renderAnalysisBox(currentFatos, null, '', '⟳ Estruturando com MarkItDown e gerando resumo...');
+  setStatus('Processando com MarkItDown & IA...', 'active');
+  addLog('Extraindo e estruturando frames do SISP com MarkItDown...', 'info');
 
-  let textoCompletoBo = '';
+  let rawFullText = '';
+  let markdownConverted = '';
+
   try {
     const tabs = await new Promise(r => chrome.tabs.query({ active: true, currentWindow: true }, r));
     const tab = tabs && tabs[0];
     if (tab) {
       const injectionResults = await chrome.scripting.executeScript({
         target: { tabId: tab.id, allFrames: true },
-        func: () => document.body ? (document.body.innerText || document.body.textContent || '') : ''
+        func: () => {
+          if (!document.body) return null;
+          return {
+            html: document.body.innerHTML || '',
+            text: document.body.innerText || document.body.textContent || ''
+          };
+        }
       });
+
       if (injectionResults && injectionResults.length > 0) {
-        textoCompletoBo = injectionResults
-          .map(frame => (frame.result || '').trim())
-          .filter(text => text.length > 20)
-          .join('\n\n---\n\n');
+        const validFrames = injectionResults
+          .map(frame => frame.result)
+          .filter(res => res && res.text && res.text.trim().length > 20);
+
+        rawFullText = validFrames.map(f => f.text.trim()).join('\n\n---\n\n');
+
+        // Conversão com MarkItDown Engine
+        if (typeof MarkItDownEngine !== 'undefined') {
+          const engine = new MarkItDownEngine();
+          const frameMds = validFrames.map(f => engine.convert(f.html));
+          markdownConverted = frameMds.filter(m => m.trim().length > 0).join('\n\n---\n\n');
+        } else {
+          markdownConverted = rawFullText;
+        }
       }
     }
   } catch (e) {
-    console.error('[Despacho IA] Erro ao extrair texto de frames:', e);
+    console.error('[Despacho IA] Erro ao extrair frames com MarkItDown:', e);
   }
 
-  if (!textoCompletoBo) {
-    textoCompletoBo = currentRelatoText;
+  if (!rawFullText) {
+    rawFullText = currentRelatoText;
   }
 
-  addLog('Chamando API Gemini...', 'info');
+  if (!markdownConverted) {
+    if (typeof MarkItDownEngine !== 'undefined') {
+      const engine = new MarkItDownEngine();
+      markdownConverted = engine.convert(rawFullText);
+    } else {
+      markdownConverted = rawFullText;
+    }
+  }
+
+  // Sanitização e Frontmatter
+  let markdownFinal = markdownConverted;
+  if (typeof MarkItDownCleaner !== 'undefined') {
+    markdownFinal = MarkItDownCleaner.sanitize(markdownConverted, {
+      fato: currentFatos || currentTipo || ''
+    });
+  }
+
+  // Atualiza painel e métricas de tokens do MarkItDown
+  updateMarkItDownUI(markdownFinal, rawFullText);
+
+  const providerCfg = (typeof getProviderConfig === 'function') ? getProviderConfig(activeProvider) : { name: 'IA' };
+  addLog(`Chamando API ${providerCfg.name} com documento MarkItDown...`, 'info');
 
   try {
-    const resumoRes = await gerarResumoRelatoIA(textoCompletoBo, currentFatos);
+    const resumoRes = await gerarResumoRelatoIA(markdownFinal, currentFatos);
     if (resumoRes.ok) {
       currentResumoIA = resumoRes.resumo;
       renderAnalysisBox(currentFatos, currentResumoIA);
-      addLog('Resumo IA gerado com sucesso', 'success');
+      addLog('Resumo IA gerado com sucesso via MarkItDown', 'success');
       const btn31 = document.getElementById('btnM3_1');
       if (btn31) btn31.classList.add('success');
     } else {
